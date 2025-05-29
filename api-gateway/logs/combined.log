@@ -1,0 +1,22 @@
+{"level":"info","message":"API Gateway running on port","port":3007,"timestamp":"2025-05-22T02:02:25.587Z"}
+{"level":"info","message":"API Gateway running on port","port":3010,"timestamp":"2025-05-22T02:04:09.937Z"}
+{"level":"info","message":"API Gateway running on port","port":3020,"timestamp":"2025-05-22T02:05:15.544Z"}
+{"level":"info","message":"API Gateway running on port","port":3020,"timestamp":"2025-05-22T02:09:56.273Z"}
+{"level":"info","message":"API Gateway running on port","port":3020,"timestamp":"2025-05-22T02:11:41.513Z"}
+{"level":"info","message":"API Gateway running on port","port":3020,"timestamp":"2025-05-22T02:48:06.342Z"}
+{"level":"info","message":"API Gateway running on port","port":3020,"timestamp":"2025-05-22T02:57:49.510Z"}
+{"level":"info","message":"API Gateway running on port","port":3020,"timestamp":"2025-05-22T03:05:17.911Z"}
+{"level":"info","message":"Incoming request","method":"GET","requestId":"5f78d742-8476-4fe1-9dbc-f57d42ebfd68","timestamp":"2025-05-22T03:05:59.001Z","url":"/api/users"}
+{"level":"info","message":"Incoming request","method":"GET","requestId":"853dd313-1c54-483f-8126-f826b55bc047","timestamp":"2025-05-22T03:05:59.159Z","url":"/favicon.ico"}
+{"level":"info","message":"API Gateway running on port","port":3020,"timestamp":"2025-05-22T03:09:08.050Z"}
+{"level":"info","message":"API Gateway running on port","port":3020,"timestamp":"2025-05-22T03:23:20.736Z"}
+{"level":"info","message":"API Gateway running on port","port":3020,"timestamp":"2025-05-22T04:33:50.819Z"}
+{"level":"info","message":"API Gateway running on port","port":3020,"timestamp":"2025-05-22T04:36:45.462Z"}
+{"level":"info","message":"API Gateway running on port","port":3020,"timestamp":"2025-05-22T04:51:54.065Z"}
+{"level":"info","message":"API Gateway running on port","port":3020,"timestamp":"2025-05-22T05:04:35.942Z"}
+{"level":"info","message":"API Gateway running on port","port":3020,"timestamp":"2025-05-22T05:10:15.086Z"}
+{"level":"info","message":"API Gateway running on port","port":"3020","timestamp":"2025-05-22T05:30:50.979Z"}
+{"level":"info","message":"API Gateway running on port","port":3020,"timestamp":"2025-05-22T05:57:07.712Z"}
+{"level":"info","message":"Incoming request","method":"GET","requestId":"8a07ab90-7560-4864-8fcb-08cc8a95c88d","timestamp":"2025-05-22T05:59:48.732Z","url":"/"}
+{"level":"info","message":"API Gateway running on port","port":3020,"timestamp":"2025-05-22T06:04:40.244Z"}
+{"level":"info","message":"API Gateway running on port","port":"3020","timestamp":"2025-05-22T06:22:55.478Z"}

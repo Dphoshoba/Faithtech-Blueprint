@@ -1,0 +1,66 @@
+name: Load Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '0 0 * * 0'  # Run weekly on Sunday
+
+jobs:
+  load-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+        env:
+          NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL }}
+
+      - name: Start server
+        run: npm start &
+        env:
+          PORT: 3000
+
+      - name: Wait for server
+        run: |
+          timeout 60 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:3000)" != "200" ]]; do sleep 2; done' || false
+
+      - name: Run k6
+        uses: grafana/k6-action@v0.2.0
+        with:
+          filename: load-test.js
+          flags: --out json=results.json
+
+      - name: Run Artillery
+        run: |
+          npm install -g artillery
+          artillery run artillery.yml
+
+      - name: Run Locust
+        run: |
+          pip install locust
+          locust -f locustfile.py --headless -u 100 -r 10 -t 1m
+
+      - name: Upload load test results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: load-test-results
+          path: |
+            results.json
+            artillery-report.json
+            locust-report.html
+          retention-days: 7 

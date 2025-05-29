@@ -1,0 +1,47 @@
+name: Dependency Updates
+
+on:
+  schedule:
+    - cron: '0 0 * * 0'  # Run weekly on Sunday
+  workflow_dispatch:  # Allow manual triggering
+
+jobs:
+  update-deps:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check for updates
+        run: npm outdated
+
+      - name: Update dependencies
+        run: |
+          npm update
+          npm audit fix
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: 'chore: update dependencies'
+          title: 'chore: update dependencies'
+          body: |
+            This PR updates the project dependencies to their latest versions.
+            
+            Changes made:
+            - Updated npm packages
+            - Fixed security vulnerabilities
+            
+            Please review the changes and merge if everything looks good.
+          branch: dependency-updates
+          base: main 

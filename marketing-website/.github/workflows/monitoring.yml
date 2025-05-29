@@ -1,0 +1,100 @@
+name: Monitoring
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'  # Run every 5 minutes
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+        env:
+          NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL }}
+
+      - name: Start server
+        run: npm start &
+        env:
+          PORT: 3000
+
+      - name: Wait for server
+        run: |
+          timeout 60 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:3000)" != "200" ]]; do sleep 2; done' || false
+
+      - name: Run Uptime Robot
+        uses: uptimerobot/uptimerobot-action@v1
+        with:
+          api-key: ${{ secrets.UPTIMEROBOT_API_KEY }}
+          monitors: ${{ secrets.UPTIMEROBOT_MONITORS }}
+
+      - name: Run Pingdom
+        uses: pingdom/pingdom-action@v1
+        with:
+          api-key: ${{ secrets.PINGDOM_API_KEY }}
+          check-ids: ${{ secrets.PINGDOM_CHECK_IDS }}
+
+      - name: Run New Relic
+        uses: newrelic/newrelic-action@v1
+        with:
+          api-key: ${{ secrets.NEW_RELIC_API_KEY }}
+          account-id: ${{ secrets.NEW_RELIC_ACCOUNT_ID }}
+
+      - name: Run Datadog
+        uses: datadog/datadog-action@v1
+        with:
+          api-key: ${{ secrets.DATADOG_API_KEY }}
+          app-key: ${{ secrets.DATADOG_APP_KEY }}
+
+      - name: Run Grafana
+        uses: grafana/grafana-action@v1
+        with:
+          api-key: ${{ secrets.GRAFANA_API_KEY }}
+          dashboard-url: ${{ secrets.GRAFANA_DASHBOARD_URL }}
+
+      - name: Run Prometheus
+        uses: prometheus/prometheus-action@v1
+        with:
+          config-file: prometheus.yml
+          target-url: http://localhost:3000/metrics
+
+      - name: Run Elastic APM
+        uses: elastic/apm-action@v1
+        with:
+          api-key: ${{ secrets.ELASTIC_APM_API_KEY }}
+          server-url: ${{ secrets.ELASTIC_APM_SERVER_URL }}
+
+      - name: Run Sentry
+        uses: getsentry/sentry-action@v1
+        with:
+          auth-token: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          org: ${{ secrets.SENTRY_ORG }}
+          project: ${{ secrets.SENTRY_PROJECT }}
+
+      - name: Upload monitoring results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: monitoring-results
+          path: |
+            uptimerobot-results/
+            pingdom-results/
+            newrelic-results/
+            datadog-results/
+            grafana-results/
+            prometheus-results/
+            elastic-apm-results/
+            sentry-results/
+          retention-days: 7 

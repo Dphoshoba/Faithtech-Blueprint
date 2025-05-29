@@ -1,0 +1,187 @@
+name: Cleanup
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '0 0 * * 0'  # Run weekly on Sunday
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run cleanup
+        run: npm run cleanup
+
+      - name: Run cleanup:prod
+        run: npm run cleanup:prod
+
+      - name: Run cleanup:dev
+        run: npm run cleanup:dev
+
+      - name: Run cleanup:staging
+        run: npm run cleanup:staging
+
+      - name: Run cleanup:test
+        run: npm run cleanup:test
+
+      - name: Run cleanup:ci
+        run: npm run cleanup:ci
+
+      - name: Run cleanup:docker
+        run: npm run cleanup:docker
+
+      - name: Run cleanup:docker:prod
+        run: npm run cleanup:docker:prod
+
+      - name: Run cleanup:docker:dev
+        run: npm run cleanup:docker:dev
+
+      - name: Run cleanup:docker:staging
+        run: npm run cleanup:docker:staging
+
+      - name: Run cleanup:docker:test
+        run: npm run cleanup:docker:test
+
+      - name: Run cleanup:docker:ci
+        run: npm run cleanup:docker:ci
+
+      - name: Run cleanup:docker:push
+        run: npm run cleanup:docker:push
+
+      - name: Run cleanup:docker:push:prod
+        run: npm run cleanup:docker:push:prod
+
+      - name: Run cleanup:docker:push:dev
+        run: npm run cleanup:docker:push:dev
+
+      - name: Run cleanup:docker:push:staging
+        run: npm run cleanup:docker:push:staging
+
+      - name: Run cleanup:docker:push:test
+        run: npm run cleanup:docker:push:test
+
+      - name: Run cleanup:docker:push:ci
+        run: npm run cleanup:docker:push:ci
+
+      - name: Run cleanup:docker:push:latest
+        run: npm run cleanup:docker:push:latest
+
+      - name: Run cleanup:docker:push:latest:prod
+        run: npm run cleanup:docker:push:latest:prod
+
+      - name: Run cleanup:docker:push:latest:dev
+        run: npm run cleanup:docker:push:latest:dev
+
+      - name: Run cleanup:docker:push:latest:staging
+        run: npm run cleanup:docker:push:latest:staging
+
+      - name: Run cleanup:docker:push:latest:test
+        run: npm run cleanup:docker:push:latest:test
+
+      - name: Run cleanup:docker:push:latest:ci
+        run: npm run cleanup:docker:push:latest:ci
+
+      - name: Run cleanup:docker:push:latest:prod:dev
+        run: npm run cleanup:docker:push:latest:prod:dev
+
+      - name: Run cleanup:docker:push:latest:prod:staging
+        run: npm run cleanup:docker:push:latest:prod:staging
+
+      - name: Run cleanup:docker:push:latest:prod:test
+        run: npm run cleanup:docker:push:latest:prod:test
+
+      - name: Run cleanup:docker:push:latest:prod:ci
+        run: npm run cleanup:docker:push:latest:prod:ci
+
+      - name: Run cleanup:docker:push:latest:dev:staging
+        run: npm run cleanup:docker:push:latest:dev:staging
+
+      - name: Run cleanup:docker:push:latest:dev:test
+        run: npm run cleanup:docker:push:latest:dev:test
+
+      - name: Run cleanup:docker:push:latest:dev:ci
+        run: npm run cleanup:docker:push:latest:dev:ci
+
+      - name: Run cleanup:docker:push:latest:staging:test
+        run: npm run cleanup:docker:push:latest:staging:test
+
+      - name: Run cleanup:docker:push:latest:staging:ci
+        run: npm run cleanup:docker:push:latest:staging:ci
+
+      - name: Run cleanup:docker:push:latest:test:ci
+        run: npm run cleanup:docker:push:latest:test:ci
+
+      - name: Run cleanup:docker:push:latest:prod:dev:staging
+        run: npm run cleanup:docker:push:latest:prod:dev:staging
+
+      - name: Run cleanup:docker:push:latest:prod:dev:test
+        run: npm run cleanup:docker:push:latest:prod:dev:test
+
+      - name: Run cleanup:docker:push:latest:prod:dev:ci
+        run: npm run cleanup:docker:push:latest:prod:dev:ci
+
+      - name: Run cleanup:docker:push:latest:prod:staging:test
+        run: npm run cleanup:docker:push:latest:prod:staging:test
+
+      - name: Run cleanup:docker:push:latest:prod:staging:ci
+        run: npm run cleanup:docker:push:latest:prod:staging:ci
+
+      - name: Run cleanup:docker:push:latest:prod:test:ci
+        run: npm run cleanup:docker:push:latest:prod:test:ci
+
+      - name: Run cleanup:docker:push:latest:dev:staging:test
+        run: npm run cleanup:docker:push:latest:dev:staging:test
+
+      - name: Run cleanup:docker:push:latest:dev:staging:ci
+        run: npm run cleanup:docker:push:latest:dev:staging:ci
+
+      - name: Run cleanup:docker:push:latest:dev:test:ci
+        run: npm run cleanup:docker:push:latest:dev:test:ci
+
+      - name: Run cleanup:docker:push:latest:staging:test:ci
+        run: npm run cleanup:docker:push:latest:staging:test:ci
+
+      - name: Run cleanup:docker:push:latest:prod:dev:staging:test
+        run: npm run cleanup:docker:push:latest:prod:dev:staging:test
+
+      - name: Run cleanup:docker:push:latest:prod:dev:staging:ci
+        run: npm run cleanup:docker:push:latest:prod:dev:staging:ci
+
+      - name: Run cleanup:docker:push:latest:prod:dev:test:ci
+        run: npm run cleanup:docker:push:latest:prod:dev:test:ci
+
+      - name: Run cleanup:docker:push:latest:prod:staging:test:ci
+        run: npm run cleanup:docker:push:latest:prod:staging:test:ci
+
+      - name: Run cleanup:docker:push:latest:dev:staging:test:ci
+        run: npm run cleanup:docker:push:latest:dev:staging:test:ci
+
+      - name: Run cleanup:docker:push:latest:prod:dev:staging:test:ci
+        run: npm run cleanup:docker:push:latest:prod:dev:staging:test:ci
+
+      - name: Upload cleanup results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: cleanup-results
+          path: |
+            dist/
+            build/
+            .next/
+            out/
+          retention-days: 7 

@@ -1,0 +1,133 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  AWS_REGION: us-east-1
+  ECR_REPOSITORY: faithtech-blueprint
+  ECS_CLUSTER: faithtech-blueprint-cluster-production
+  ECS_SERVICE_PREFIX: faithtech-blueprint
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          cd client && npm ci
+
+      - name: Run tests
+        run: |
+          npm run test:ci
+          cd client && npm run test:ci
+
+  deploy-backend:
+    needs: test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: [user-service, assessment-service, template-service, api-gateway]
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+      
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+      
+      - name: Build, tag, and push image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:${{ matrix.service }}-$IMAGE_TAG ./services/${{ matrix.service }}
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:${{ matrix.service }}-$IMAGE_TAG
+      
+      - name: Update ECS service
+        run: |
+          aws ecs update-service \
+            --cluster ${{ env.ECS_CLUSTER }} \
+            --service ${{ env.ECS_SERVICE_PREFIX }}-${{ matrix.service }} \
+            --force-new-deployment
+  
+  deploy-frontend:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+          cache: 'npm'
+          cache-dependency-path: client/package-lock.json
+      
+      - name: Install dependencies
+        run: cd client && npm ci
+      
+      - name: Build production bundle
+        run: cd client && npm run build
+        env:
+          REACT_APP_API_URL: ${{ secrets.PROD_API_URL }}
+          REACT_APP_GA_ID: ${{ secrets.GA_MEASUREMENT_ID }}
+          REACT_APP_SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+      
+      - name: Deploy to S3
+        run: |
+          aws s3 sync client/build s3://faithtech-blueprint-production --delete
+      
+      - name: Invalidate CloudFront cache
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
+            --paths "/*"
+
+  notify:
+    needs: [deploy-backend, deploy-frontend]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify Slack
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          fields: repo,message,commit,author,action,eventName,ref,workflow
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        if: always()
+
+      - name: Create Sentry release
+        uses: getsentry/action-release@v1
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+        with:
+          environment: production
+          version: ${{ github.sha }} 

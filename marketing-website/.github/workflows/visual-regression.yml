@@ -1,0 +1,73 @@
+name: Visual Regression Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '0 0 * * 0'  # Run weekly on Sunday
+
+jobs:
+  visual-regression:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+        env:
+          NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL }}
+
+      - name: Start server
+        run: npm start &
+        env:
+          PORT: 3000
+
+      - name: Wait for server
+        run: |
+          timeout 60 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:3000)" != "200" ]]; do sleep 2; done' || false
+
+      - name: Run Percy
+        uses: percy/cli-action@v1
+        with:
+          project: faithtech-marketing-website
+          command: percy snapshot --widths 1280,375
+        env:
+          PERCY_TOKEN: ${{ secrets.PERCY_TOKEN }}
+
+      - name: Run Chromatic
+        uses: chromaui/action@v1
+        with:
+          projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+          exitZeroOnChanges: true
+
+      - name: Run Cypress Visual Testing
+        uses: cypress-io/github-action@v4
+        with:
+          install-command: npm ci
+          start: npm start
+          wait-on: 'http://localhost:3000'
+          config: video=false
+        env:
+          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+
+      - name: Upload visual regression results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: visual-regression-results
+          path: |
+            cypress/videos/
+            cypress/screenshots/
+          retention-days: 7 

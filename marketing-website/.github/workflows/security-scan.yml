@@ -1,0 +1,134 @@
+name: Security Scan
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '0 0 * * 0'  # Run weekly on Sunday
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run OWASP ZAP
+        uses: zaproxy/action-baseline@v0.7.0
+        with:
+          target: 'http://localhost:3000'
+          rules_file_name: '.zap/rules.tsv'
+          cmd_options: '-a'
+
+      - name: Run Trivy
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'localhost:3000'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Run Clair
+        uses: aquasecurity/clair-action@v1
+        with:
+          image: 'localhost:3000'
+          severity: 'High'
+          fail-on: 'High'
+
+      - name: Run Anchore
+        uses: anchore/scan-action@v3
+        with:
+          image: 'localhost:3000'
+          fail-build: true
+          severity-cutoff: 'high'
+          timeout: '300'
+
+      - name: Run Snyk Container
+        uses: snyk/actions/container@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          image: 'localhost:3000'
+          args: --severity-threshold=high
+
+      - name: Run Grype
+        uses: anchore/grype-action@v1
+        with:
+          image: 'localhost:3000'
+          fail-on: 'high'
+          output: 'table'
+
+      - name: Run Dependency Track
+        uses: dependencytrack/action@v1
+        with:
+          project-name: 'Faithtech Marketing Website'
+          project-version: '1.0.0'
+          bom-file: 'bom.xml'
+          api-key: ${{ secrets.DEPENDENCY_TRACK_API_KEY }}
+          api-url: ${{ secrets.DEPENDENCY_TRACK_API_URL }}
+
+      - name: Run OSSAR
+        uses: microsoft/ossar-action@v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: .
+          fail-on-severity: 'high'
+
+      - name: Run GitLeaks
+        uses: zricethezav/gitleaks-action@v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          config-path: .gitleaks.toml
+
+      - name: Run TruffleHog
+        uses: trufflesecurity/trufflehog@v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: .
+          base: ${{ github.event.repository.default_branch }}
+          head: ${{ github.head_ref }}
+
+      - name: Run SonarQube
+        uses: SonarSource/sonarqube-scan-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+
+      - name: Run CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: javascript
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+
+      - name: Run Semgrep
+        uses: returntocorp/semgrep-action@v1
+        with:
+          config: "p/security-audit"
+
+      - name: Upload scan results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: security-scan-results
+          path: |
+            reports/
+            .zap/
+            .sonarqube/
+            .codeql/
+            .semgrep/
+          retention-days: 7 

@@ -1,0 +1,52 @@
+config:
+  target: "http://localhost:3000"
+  phases:
+    - duration: 30
+      arrivalRate: 1
+      rampTo: 20
+      name: "Warm up"
+    - duration: 60
+      arrivalRate: 20
+      name: "Sustained load"
+    - duration: 30
+      arrivalRate: 20
+      rampTo: 0
+      name: "Cool down"
+  defaults:
+    headers:
+      User-Agent: "Artillery Load Test"
+  processor: "./artillery-functions.js"
+
+scenarios:
+  - name: "Browse website"
+    flow:
+      - get:
+          url: "/"
+          expect:
+            - statusCode: 200
+            - hasProperty: "body"
+      - think: 1
+      - get:
+          url: "/features"
+          expect:
+            - statusCode: 200
+            - hasProperty: "body"
+      - think: 1
+      - get:
+          url: "/pricing"
+          expect:
+            - statusCode: 200
+            - hasProperty: "body"
+      - think: 1
+      - get:
+          url: "/about"
+          expect:
+            - statusCode: 200
+            - hasProperty: "body"
+      - think: 1
+      - get:
+          url: "/contact"
+          expect:
+            - statusCode: 200
+            - hasProperty: "body"
+      - think: 1 

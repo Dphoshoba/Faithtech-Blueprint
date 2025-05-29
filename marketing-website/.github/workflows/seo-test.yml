@@ -1,0 +1,79 @@
+name: SEO Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '0 0 * * 0'  # Run weekly on Sunday
+
+jobs:
+  seo:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+        env:
+          NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL }}
+
+      - name: Start server
+        run: npm start &
+        env:
+          PORT: 3000
+
+      - name: Wait for server
+        run: |
+          timeout 60 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:3000)" != "200" ]]; do sleep 2; done' || false
+
+      - name: Run Screaming Frog
+        uses: screamingfrog/seo-spider-action@v1
+        with:
+          url: 'http://localhost:3000'
+          output: 'screamingfrog-results'
+          config: |
+            --headless
+            --crawl-limit 100
+            --export-format csv
+            --bulk-export "All Inlinks,All Outlinks,Directives,Images,JavaScript,Redirects,Response Codes,Title,Description,H1,H2,Canonicals,Open Graph,Twitter Cards"
+
+      - name: Run Lighthouse SEO
+        uses: treosh/lighthouse-ci-action@v9
+        with:
+          uploadArtifacts: true
+          temporaryPublicStorage: true
+          configPath: './lighthouserc-seo.js'
+          runs: 3
+
+      - name: Run Sitebulb
+        uses: sitebulb/sitebulb-action@v1
+        with:
+          url: 'http://localhost:3000'
+          output: 'sitebulb-results'
+          config: |
+            --crawl-limit 100
+            --export-format json
+            --checks "All SEO Issues"
+
+      - name: Upload SEO results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: seo-results
+          path: |
+            screamingfrog-results/
+            .lighthouseci/
+            sitebulb-results/
+          retention-days: 7 

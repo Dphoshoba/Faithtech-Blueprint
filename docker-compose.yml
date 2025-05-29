@@ -1,0 +1,117 @@
+version: '3.8'
+
+services:
+  # API Gateway
+  api-gateway:
+    build:
+      context: ./services/api-gateway
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - AUTH_SERVICE_URL=http://auth-service:3001
+      - ASSESSMENT_SERVICE_URL=http://assessment-service:3002
+      - TEMPLATE_SERVICE_URL=http://template-service:3003
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=http://localhost:3000
+    depends_on:
+      - auth-service
+      - assessment-service
+      - template-service
+
+  # Auth Service
+  auth-service:
+    build:
+      context: ./services/auth-service
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=development
+      - PORT=3001
+      - MONGODB_URI=mongodb://mongodb:27017/auth
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_EXPIRES_IN=24h
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASS=${SMTP_PASS}
+    depends_on:
+      - mongodb
+
+  # Assessment Service
+  assessment-service:
+    build:
+      context: ./services/assessment-service
+      dockerfile: Dockerfile
+    ports:
+      - "3002:3002"
+    environment:
+      - NODE_ENV=development
+      - PORT=3002
+      - MONGODB_URI=mongodb://mongodb:27017/assessment
+    depends_on:
+      - mongodb
+
+  # Template Service
+  template-service:
+    build:
+      context: ./services/template-service
+      dockerfile: Dockerfile
+    ports:
+      - "3003:3003"
+    environment:
+      - NODE_ENV=development
+      - PORT=3003
+      - MONGODB_URI=mongodb://mongodb:27017/faithtech
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_REGION=${AWS_REGION}
+      - AWS_S3_BUCKET=${AWS_S3_BUCKET}
+    depends_on:
+      - mongodb
+      - redis
+
+  # Frontend Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    environment:
+      - NODE_ENV=development
+      - REACT_APP_API_URL=http://localhost:3000/api
+    depends_on:
+      - api-gateway
+
+  # MongoDB
+  mongodb:
+    image: mongo:5.0
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+
+  # Redis for caching
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    networks:
+      - app-network
+
+volumes:
+  mongodb_data:
+  redis_data:
+
+networks:
+  app-network:
+    driver: bridge

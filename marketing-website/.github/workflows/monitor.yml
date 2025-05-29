@@ -1,0 +1,187 @@
+name: Monitor
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '0 0 * * 0'  # Run weekly on Sunday
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run monitoring
+        run: npm run monitor
+
+      - name: Run monitoring:prod
+        run: npm run monitor:prod
+
+      - name: Run monitoring:dev
+        run: npm run monitor:dev
+
+      - name: Run monitoring:staging
+        run: npm run monitor:staging
+
+      - name: Run monitoring:test
+        run: npm run monitor:test
+
+      - name: Run monitoring:ci
+        run: npm run monitor:ci
+
+      - name: Run monitoring:docker
+        run: npm run monitor:docker
+
+      - name: Run monitoring:docker:prod
+        run: npm run monitor:docker:prod
+
+      - name: Run monitoring:docker:dev
+        run: npm run monitor:docker:dev
+
+      - name: Run monitoring:docker:staging
+        run: npm run monitor:docker:staging
+
+      - name: Run monitoring:docker:test
+        run: npm run monitor:docker:test
+
+      - name: Run monitoring:docker:ci
+        run: npm run monitor:docker:ci
+
+      - name: Run monitoring:docker:push
+        run: npm run monitor:docker:push
+
+      - name: Run monitoring:docker:push:prod
+        run: npm run monitor:docker:push:prod
+
+      - name: Run monitoring:docker:push:dev
+        run: npm run monitor:docker:push:dev
+
+      - name: Run monitoring:docker:push:staging
+        run: npm run monitor:docker:push:staging
+
+      - name: Run monitoring:docker:push:test
+        run: npm run monitor:docker:push:test
+
+      - name: Run monitoring:docker:push:ci
+        run: npm run monitor:docker:push:ci
+
+      - name: Run monitoring:docker:push:latest
+        run: npm run monitor:docker:push:latest
+
+      - name: Run monitoring:docker:push:latest:prod
+        run: npm run monitor:docker:push:latest:prod
+
+      - name: Run monitoring:docker:push:latest:dev
+        run: npm run monitor:docker:push:latest:dev
+
+      - name: Run monitoring:docker:push:latest:staging
+        run: npm run monitor:docker:push:latest:staging
+
+      - name: Run monitoring:docker:push:latest:test
+        run: npm run monitor:docker:push:latest:test
+
+      - name: Run monitoring:docker:push:latest:ci
+        run: npm run monitor:docker:push:latest:ci
+
+      - name: Run monitoring:docker:push:latest:prod:dev
+        run: npm run monitor:docker:push:latest:prod:dev
+
+      - name: Run monitoring:docker:push:latest:prod:staging
+        run: npm run monitor:docker:push:latest:prod:staging
+
+      - name: Run monitoring:docker:push:latest:prod:test
+        run: npm run monitor:docker:push:latest:prod:test
+
+      - name: Run monitoring:docker:push:latest:prod:ci
+        run: npm run monitor:docker:push:latest:prod:ci
+
+      - name: Run monitoring:docker:push:latest:dev:staging
+        run: npm run monitor:docker:push:latest:dev:staging
+
+      - name: Run monitoring:docker:push:latest:dev:test
+        run: npm run monitor:docker:push:latest:dev:test
+
+      - name: Run monitoring:docker:push:latest:dev:ci
+        run: npm run monitor:docker:push:latest:dev:ci
+
+      - name: Run monitoring:docker:push:latest:staging:test
+        run: npm run monitor:docker:push:latest:staging:test
+
+      - name: Run monitoring:docker:push:latest:staging:ci
+        run: npm run monitor:docker:push:latest:staging:ci
+
+      - name: Run monitoring:docker:push:latest:test:ci
+        run: npm run monitor:docker:push:latest:test:ci
+
+      - name: Run monitoring:docker:push:latest:prod:dev:staging
+        run: npm run monitor:docker:push:latest:prod:dev:staging
+
+      - name: Run monitoring:docker:push:latest:prod:dev:test
+        run: npm run monitor:docker:push:latest:prod:dev:test
+
+      - name: Run monitoring:docker:push:latest:prod:dev:ci
+        run: npm run monitor:docker:push:latest:prod:dev:ci
+
+      - name: Run monitoring:docker:push:latest:prod:staging:test
+        run: npm run monitor:docker:push:latest:prod:staging:test
+
+      - name: Run monitoring:docker:push:latest:prod:staging:ci
+        run: npm run monitor:docker:push:latest:prod:staging:ci
+
+      - name: Run monitoring:docker:push:latest:prod:test:ci
+        run: npm run monitor:docker:push:latest:prod:test:ci
+
+      - name: Run monitoring:docker:push:latest:dev:staging:test
+        run: npm run monitor:docker:push:latest:dev:staging:test
+
+      - name: Run monitoring:docker:push:latest:dev:staging:ci
+        run: npm run monitor:docker:push:latest:dev:staging:ci
+
+      - name: Run monitoring:docker:push:latest:dev:test:ci
+        run: npm run monitor:docker:push:latest:dev:test:ci
+
+      - name: Run monitoring:docker:push:latest:staging:test:ci
+        run: npm run monitor:docker:push:latest:staging:test:ci
+
+      - name: Run monitoring:docker:push:latest:prod:dev:staging:test
+        run: npm run monitor:docker:push:latest:prod:dev:staging:test
+
+      - name: Run monitoring:docker:push:latest:prod:dev:staging:ci
+        run: npm run monitor:docker:push:latest:prod:dev:staging:ci
+
+      - name: Run monitoring:docker:push:latest:prod:dev:test:ci
+        run: npm run monitor:docker:push:latest:prod:dev:test:ci
+
+      - name: Run monitoring:docker:push:latest:prod:staging:test:ci
+        run: npm run monitor:docker:push:latest:prod:staging:test:ci
+
+      - name: Run monitoring:docker:push:latest:dev:staging:test:ci
+        run: npm run monitor:docker:push:latest:dev:staging:test:ci
+
+      - name: Run monitoring:docker:push:latest:prod:dev:staging:test:ci
+        run: npm run monitor:docker:push:latest:prod:dev:staging:test:ci
+
+      - name: Upload monitoring results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: monitoring-results
+          path: |
+            dist/
+            build/
+            .next/
+            out/
+          retention-days: 7 

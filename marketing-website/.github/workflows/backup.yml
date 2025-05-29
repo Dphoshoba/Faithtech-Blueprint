@@ -1,0 +1,187 @@
+name: Backup
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '0 0 * * 0'  # Run weekly on Sunday
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run backup
+        run: npm run backup
+
+      - name: Run backup:prod
+        run: npm run backup:prod
+
+      - name: Run backup:dev
+        run: npm run backup:dev
+
+      - name: Run backup:staging
+        run: npm run backup:staging
+
+      - name: Run backup:test
+        run: npm run backup:test
+
+      - name: Run backup:ci
+        run: npm run backup:ci
+
+      - name: Run backup:docker
+        run: npm run backup:docker
+
+      - name: Run backup:docker:prod
+        run: npm run backup:docker:prod
+
+      - name: Run backup:docker:dev
+        run: npm run backup:docker:dev
+
+      - name: Run backup:docker:staging
+        run: npm run backup:docker:staging
+
+      - name: Run backup:docker:test
+        run: npm run backup:docker:test
+
+      - name: Run backup:docker:ci
+        run: npm run backup:docker:ci
+
+      - name: Run backup:docker:push
+        run: npm run backup:docker:push
+
+      - name: Run backup:docker:push:prod
+        run: npm run backup:docker:push:prod
+
+      - name: Run backup:docker:push:dev
+        run: npm run backup:docker:push:dev
+
+      - name: Run backup:docker:push:staging
+        run: npm run backup:docker:push:staging
+
+      - name: Run backup:docker:push:test
+        run: npm run backup:docker:push:test
+
+      - name: Run backup:docker:push:ci
+        run: npm run backup:docker:push:ci
+
+      - name: Run backup:docker:push:latest
+        run: npm run backup:docker:push:latest
+
+      - name: Run backup:docker:push:latest:prod
+        run: npm run backup:docker:push:latest:prod
+
+      - name: Run backup:docker:push:latest:dev
+        run: npm run backup:docker:push:latest:dev
+
+      - name: Run backup:docker:push:latest:staging
+        run: npm run backup:docker:push:latest:staging
+
+      - name: Run backup:docker:push:latest:test
+        run: npm run backup:docker:push:latest:test
+
+      - name: Run backup:docker:push:latest:ci
+        run: npm run backup:docker:push:latest:ci
+
+      - name: Run backup:docker:push:latest:prod:dev
+        run: npm run backup:docker:push:latest:prod:dev
+
+      - name: Run backup:docker:push:latest:prod:staging
+        run: npm run backup:docker:push:latest:prod:staging
+
+      - name: Run backup:docker:push:latest:prod:test
+        run: npm run backup:docker:push:latest:prod:test
+
+      - name: Run backup:docker:push:latest:prod:ci
+        run: npm run backup:docker:push:latest:prod:ci
+
+      - name: Run backup:docker:push:latest:dev:staging
+        run: npm run backup:docker:push:latest:dev:staging
+
+      - name: Run backup:docker:push:latest:dev:test
+        run: npm run backup:docker:push:latest:dev:test
+
+      - name: Run backup:docker:push:latest:dev:ci
+        run: npm run backup:docker:push:latest:dev:ci
+
+      - name: Run backup:docker:push:latest:staging:test
+        run: npm run backup:docker:push:latest:staging:test
+
+      - name: Run backup:docker:push:latest:staging:ci
+        run: npm run backup:docker:push:latest:staging:ci
+
+      - name: Run backup:docker:push:latest:test:ci
+        run: npm run backup:docker:push:latest:test:ci
+
+      - name: Run backup:docker:push:latest:prod:dev:staging
+        run: npm run backup:docker:push:latest:prod:dev:staging
+
+      - name: Run backup:docker:push:latest:prod:dev:test
+        run: npm run backup:docker:push:latest:prod:dev:test
+
+      - name: Run backup:docker:push:latest:prod:dev:ci
+        run: npm run backup:docker:push:latest:prod:dev:ci
+
+      - name: Run backup:docker:push:latest:prod:staging:test
+        run: npm run backup:docker:push:latest:prod:staging:test
+
+      - name: Run backup:docker:push:latest:prod:staging:ci
+        run: npm run backup:docker:push:latest:prod:staging:ci
+
+      - name: Run backup:docker:push:latest:prod:test:ci
+        run: npm run backup:docker:push:latest:prod:test:ci
+
+      - name: Run backup:docker:push:latest:dev:staging:test
+        run: npm run backup:docker:push:latest:dev:staging:test
+
+      - name: Run backup:docker:push:latest:dev:staging:ci
+        run: npm run backup:docker:push:latest:dev:staging:ci
+
+      - name: Run backup:docker:push:latest:dev:test:ci
+        run: npm run backup:docker:push:latest:dev:test:ci
+
+      - name: Run backup:docker:push:latest:staging:test:ci
+        run: npm run backup:docker:push:latest:staging:test:ci
+
+      - name: Run backup:docker:push:latest:prod:dev:staging:test
+        run: npm run backup:docker:push:latest:prod:dev:staging:test
+
+      - name: Run backup:docker:push:latest:prod:dev:staging:ci
+        run: npm run backup:docker:push:latest:prod:dev:staging:ci
+
+      - name: Run backup:docker:push:latest:prod:dev:test:ci
+        run: npm run backup:docker:push:latest:prod:dev:test:ci
+
+      - name: Run backup:docker:push:latest:prod:staging:test:ci
+        run: npm run backup:docker:push:latest:prod:staging:test:ci
+
+      - name: Run backup:docker:push:latest:dev:staging:test:ci
+        run: npm run backup:docker:push:latest:dev:staging:test:ci
+
+      - name: Run backup:docker:push:latest:prod:dev:staging:test:ci
+        run: npm run backup:docker:push:latest:prod:dev:staging:test:ci
+
+      - name: Upload backup results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: backup-results
+          path: |
+            dist/
+            build/
+            .next/
+            out/
+          retention-days: 7 
