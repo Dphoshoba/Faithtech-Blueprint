@@ -128,8 +128,86 @@ jobs:
       - name: Run Jasmine tests
         run: npm run test:jasmine
 
+      - name: Run Mocha tests
+        run: npm run test:mocha
+
+      - name: Run Jest tests
+        run: npm run test:jest
+
+      - name: Run Ava tests
+        run: npm run test:ava
+
+      - name: Run Tape tests
+        run: npm run test:tape
+
+      - name: Run Vitest tests
+        run: npm run test:vitest
+
+      - name: Run TestCafe tests
+        run: npm run test:testcafe
+
+      - name: Run Puppeteer tests
+        run: npm run test:puppeteer
+
+      - name: Run Selenium tests
+        run: npm run test:selenium
+
+      - name: Run WebdriverIO tests
+        run: npm run test:webdriverio
+
+      - name: Run Nightwatch tests
+        run: npm run test:nightwatch
+
+      - name: Run Protractor tests
+        run: npm run test:protractor
+
+      - name: Run Karma tests
+        run: npm run test:karma
+
+      - name: Run Jasmine tests
+        run: npm run test:jasmine
+
+      - name: Run Mocha tests
+        run: npm run test:mocha
+
+      - name: Run Jest tests
+        run: npm run test:jest
+
+      - name: Run Ava tests
+        run: npm run test:ava
+
+      - name: Run Tape tests
+        run: npm run test:tape
+
+      - name: Run Vitest tests
+        run: npm run test:vitest
+
+      - name: Run TestCafe tests
+        run: npm run test:testcafe
+
+      - name: Run Puppeteer tests
+        run: npm run test:puppeteer
+
+      - name: Run Selenium tests
+        run: npm run test:selenium
+
+      - name: Run WebdriverIO tests
+        run: npm run test:webdriverio
+
+      - name: Run Nightwatch tests
+        run: npm run test:nightwatch
+
+      - name: Run Protractor tests
+        run: npm run test:protractor
+
+      - name: Run Karma tests
+        run: npm run test:karma
+
+      - name: Run Jasmine tests
+        run: npm run test:jasmine
+
       - name: Upload test results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: test-results
