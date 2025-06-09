@@ -54,7 +54,7 @@ jobs:
           NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL }}
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: build
           path: .next
@@ -87,4 +87,16 @@ jobs:
 
       - name: Invalidate CloudFront cache
         run: |
-          aws cloudfront create-invalidation --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} --paths "/*" 
+          aws cloudfront create-invalidation --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} --paths "/*"
+
+      - name: Upload CI results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ci-results
+          path: |
+            dist/
+            build/
+            .next/
+            out/
+          retention-days: 7 
