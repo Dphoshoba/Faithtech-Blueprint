@@ -1,0 +1,11 @@
+  - name: Upload rollback results
+    uses: actions/upload-artifact@v4
+    if: always()
+    with:
+      name: rollback-results
+      path: |
+        dist/
+        build/
+        .next/
+        out/
+      retention-days: 7 
