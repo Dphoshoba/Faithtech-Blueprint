@@ -1,0 +1,107 @@
+// Marketing Models
+model Campaign {
+  id            String   @id @default(cuid())
+  name          String
+  description   String
+  startDate     DateTime
+  endDate       DateTime
+  budget        Float
+  targetAudience String[]
+  channels      String[]
+  goals         Json
+  strategy      Json?
+  status        String
+  metrics       Json
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model CampaignMetrics {
+  id        String   @id @default(cuid())
+  campaignId String
+  metrics   Json
+  timestamp DateTime @default(now())
+  campaign  Campaign @relation(fields: [campaignId], references: [id])
+}
+
+model CampaignAudience {
+  id         String   @id @default(cuid())
+  campaignId String
+  userId     String
+  interactions Json[]
+  campaign   Campaign @relation(fields: [campaignId], references: [id])
+}
+
+model EmailTemplate {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  subject   String
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model EmailLog {
+  id        String   @id @default(cuid())
+  template  String
+  recipient String
+  subject   String
+  content   String
+  messageId String
+  status    String
+  opened    Boolean  @default(false)
+  clicked   Boolean  @default(false)
+  error     String?
+  createdAt DateTime @default(now())
+}
+
+model SocialMediaPost {
+  id          String   @id @default(cuid())
+  platform    String
+  content     String
+  postId      String
+  url         String
+  status      String
+  metrics     Json?
+  scheduledFor DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model ScheduledPost {
+  id          String   @id @default(cuid())
+  platform    String
+  content     String
+  scheduledFor DateTime
+  status      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model AutomationWorkflow {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  trigger     Json
+  actions     Json
+  status      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model WorkflowExecution {
+  id          String   @id @default(cuid())
+  workflowId  String
+  context     Json
+  results     Json
+  status      String
+  executionTime Float
+  createdAt   DateTime @default(now())
+}
+
+model Event {
+  id        String   @id @default(cuid())
+  type      String
+  data      Json
+  timestamp DateTime @default(now())
+} 

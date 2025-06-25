@@ -175,7 +175,7 @@ jobs:
         run: npm run monitor:docker:push:latest:prod:dev:staging:test:ci
 
       - name: Upload monitoring results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: monitoring-results

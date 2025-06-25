@@ -3,160 +3,120 @@
 ## General Questions
 
 ### What is FaithTech Blueprint?
-FaithTech Blueprint is a comprehensive subscription and billing management system designed specifically for faith-based organizations. It includes features for user management, subscription handling, billing, analytics, and assessment tools.
+FaithTech Blueprint is a comprehensive platform designed to help faith-based organizations manage their technology needs, including project management, resource allocation, and team collaboration.
 
-### Who can use FaithTech Blueprint?
-Our platform is designed for:
+### Who is FaithTech Blueprint for?
+FaithTech Blueprint is designed for:
 - Churches and religious organizations
-- Faith-based nonprofits
+- Faith-based non-profits
 - Religious educational institutions
-- Ministry organizations
-- Faith-based businesses
+- Faith-based community groups
 
-### Is FaithTech Blueprint available in multiple languages?
-Yes, we currently support:
-- English
-- Spanish
-- French
-- Portuguese
-Additional languages are being added based on community needs.
-
-## Account Management
+## Getting Started
 
 ### How do I create an account?
-1. Visit our registration page
-2. Enter your organization details
-3. Verify your email
-4. Complete organization profile
-5. Choose a subscription plan
+1. Visit [faithtech-blueprint.com/register](https://faithtech-blueprint.com/register)
+2. Fill in your organization details
+3. Verify your email address
+4. Complete your profile setup
 
-### How do I reset my password?
-1. Click "Forgot Password" on the login page
-2. Enter your email address
-3. Check your email for reset instructions
-4. Follow the link to create a new password
+### What are the system requirements?
+- Modern web browser (Chrome, Firefox, Safari, Edge)
+- Stable internet connection
+- Minimum screen resolution: 1280x720
+- JavaScript enabled
+- Cookies enabled
 
-### Can I have multiple administrators?
-Yes, you can have multiple administrators with different permission levels. Configure this in the User Management section.
+## Features
 
-## Billing and Payments
+### Project Management
+Q: How do I create a new project?
+A: Navigate to the Projects section, click "Create New Project," and follow the setup wizard.
 
-### What payment methods do you accept?
-We accept:
-- Credit/Debit cards
-- ACH transfers (US only)
-- Wire transfers
-- PayPal
-- International payments via Stripe
+Q: Can I assign team members to projects?
+A: Yes, you can assign team members and set their roles and permissions.
 
-### How does billing work?
-- Monthly or annual billing cycles
-- Automatic renewals
-- Pro-rated charges for mid-cycle changes
-- Flexible payment dates
+### Templates
+Q: What types of templates are available?
+A: We offer templates for:
+- Project planning
+- Resource allocation
+- Team management
+- Budget tracking
+- Event planning
 
-### Can I change my subscription plan?
-Yes, you can:
-- Upgrade/downgrade at any time
-- Add/remove user seats
-- Switch between monthly/annual billing
-- Cancel with 30-day notice
+Q: Can I customize templates?
+A: Yes, all templates can be customized to fit your organization's needs.
 
 ## Technical Support
 
-### How do I get technical support?
-Support options include:
-- 24/7 email support
-- Live chat during business hours
-- Phone support for enterprise plans
-- Community forums
-- Knowledge base
+### How do I get help?
+- Email: support@faithtech-blueprint.com
+- Live Chat: Available during business hours
+- Documentation: [docs.faithtech-blueprint.com](https://docs.faithtech-blueprint.com)
+- Community Forum: [community.faithtech-blueprint.com](https://community.faithtech-blueprint.com)
 
-### What browsers are supported?
-Supported browsers:
-- Chrome (latest 2 versions)
-- Firefox (latest 2 versions)
-- Safari (latest 2 versions)
-- Edge (latest 2 versions)
+### What are your support hours?
+- Monday-Friday: 9 AM - 5 PM EST
+- Emergency support available 24/7 for critical issues
 
-### Is there a mobile app?
-Yes, we offer:
-- iOS app
-- Android app
-- Progressive Web App (PWA)
-- Mobile-responsive web interface
+## Billing and Subscription
+
+### What payment methods do you accept?
+- Credit/Debit Cards
+- PayPal
+- Bank Transfer
+- Purchase Orders (for enterprise accounts)
+
+### Can I change my subscription plan?
+Yes, you can upgrade or downgrade your plan at any time. Changes will be reflected in your next billing cycle.
 
 ## Security and Privacy
 
-### How is our data protected?
-We implement:
-- End-to-end encryption
+### How is my data protected?
+- All data is encrypted in transit and at rest
 - Regular security audits
-- GDPR compliance
-- Data backups
-- Multi-factor authentication
+- GDPR compliant
+- HIPAA compliant (for applicable data)
 
-### Where is our data stored?
-- Data centers in US and EU
-- Regular backups
-- Compliance with local data regulations
-- Option for data region selection
+### Can I export my data?
+Yes, you can export your data in various formats (CSV, JSON, PDF) at any time.
 
-### Can we export our data?
-Yes, you can:
-- Export to various formats (CSV, JSON, etc.)
-- Schedule regular exports
-- Use our API for data access
-- Request complete data archives
+## Integration
 
-## Integration and Customization
+### What third-party services do you integrate with?
+- Google Workspace
+- Microsoft 365
+- Slack
+- Zoom
+- QuickBooks
+- And many more...
 
-### Can we integrate with other systems?
-Yes, we support integration with:
-- Church management systems
-- Accounting software
-- CRM systems
-- Email marketing platforms
-- Custom APIs
+### How do I set up integrations?
+1. Go to Settings > Integrations
+2. Select the service you want to connect
+3. Follow the authentication process
+4. Configure integration settings
 
-### Can we customize the platform?
-Customization options include:
-- Branding and white-labeling
-- Custom fields and forms
-- Workflow automation
-- Custom reports
-- API access
+## Training and Resources
 
-## Troubleshooting
+### Do you offer training?
+Yes, we offer:
+- Onboarding sessions
+- Regular webinars
+- Custom training for teams
+- Video tutorials
+- Documentation
 
-### Common Issues
-1. **Login Problems**
-   - Clear browser cache
-   - Check email verification
-   - Reset password if needed
-
-2. **Payment Issues**
-   - Verify payment method
-   - Check billing information
-   - Contact support for assistance
-
-3. **Performance Issues**
-   - Check internet connection
-   - Clear browser cache
-   - Update browser
-   - Contact support if persistent
-
-## Additional Resources
-
-- [Getting Started Guide](../getting-started/README.md)
-- [Feature Walkthroughs](../features/README.md)
-- [Video Tutorials](../video-tutorials/README.md)
-- [API Documentation](../api/README.md)
+### Where can I find learning resources?
+- [Video Tutorials](video-tutorials/)
+- [Documentation](docs/)
+- [Blog](https://blog.faithtech-blueprint.com)
+- [Community Forum](https://community.faithtech-blueprint.com)
 
 ## Still Have Questions?
 
-Contact us through:
-- Email: support@faithtech-blueprint.com
-- Phone: 1-800-FAITH-TECH
-- Live Chat: Available on our website
-- Community Forum: [community.faithtech-blueprint.com](https://community.faithtech-blueprint.com) 
+If you can't find the answer you're looking for, please:
+1. Check our [documentation](docs/)
+2. Search our [community forum](https://community.faithtech-blueprint.com)
+3. Contact our [support team](mailto:support@faithtech-blueprint.com) 

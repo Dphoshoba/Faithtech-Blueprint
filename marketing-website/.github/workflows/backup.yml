@@ -175,7 +175,7 @@ jobs:
         run: npm run backup:docker:push:latest:prod:dev:staging:test:ci
 
       - name: Upload backup results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: backup-results

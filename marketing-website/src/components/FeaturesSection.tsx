@@ -36,7 +36,7 @@ const features: Feature[] = [
   {
     name: 'Growth Analytics',
     description:
-      'Track attendance, giving, and engagement metrics to measure your ministry's impact and identify growth opportunities.',
+      'Track attendance, giving, and engagement metrics to measure your ministry\'s impact and identify growth opportunities.',
     icon: FaChartLine,
   },
   {
@@ -48,7 +48,7 @@ const features: Feature[] = [
   {
     name: 'Secure Platform',
     description:
-      'Rest easy knowing your church's data is protected with enterprise-grade security and regular backups.',
+      'Rest easy knowing your church\'s data is protected with enterprise-grade security and regular backups.',
     icon: FaLock,
   },
 ];
@@ -113,4 +113,4 @@ const FeaturesSection = () => {
   );
 };
 
-export default FeaturesSection; 
+export default FeaturesSection;

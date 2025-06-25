@@ -1,405 +1,383 @@
-# Deployment Guide
+# Deployment Guides
 
-## Production Environment Setup
+This guide provides comprehensive instructions for deploying the FaithTech platform.
 
-### System Requirements
+## Table of Contents
 
-- Node.js 18.x or higher
-- Docker 24.x or higher
-- Docker Compose v2.x
-- 4GB RAM minimum (8GB recommended)
-- 20GB storage minimum
-- Linux-based OS (Ubuntu 22.04 LTS recommended)
+1. [Prerequisites](#prerequisites)
+2. [Environment Setup](#environment-setup)
+3. [Infrastructure Deployment](#infrastructure-deployment)
+4. [Application Deployment](#application-deployment)
+5. [Database Migration](#database-migration)
+6. [Monitoring Setup](#monitoring-setup)
+7. [Security Configuration](#security-configuration)
+8. [Troubleshooting](#troubleshooting)
 
-### Infrastructure Components
+## Prerequisites
 
-1. **Application Servers**
-   - Load Balancer (NGINX)
-   - API Gateway
-   - Microservices
-   - Static File Server
+### Required Tools
+- AWS CLI (v2.0.0 or later)
+- Terraform (v1.0.0 or later)
+- Docker (v20.10.0 or later)
+- Node.js (v16.0.0 or later)
+- PostgreSQL (v13.0 or later)
+- Redis (v6.0 or later)
 
-2. **Database Servers**
-   - Primary Database (PostgreSQL)
-   - Redis Cache
-   - MongoDB (Assessment Data)
+### AWS Account Setup
+1. Create an AWS account if you don't have one
+2. Configure AWS CLI with your credentials:
+   ```bash
+   aws configure
+   ```
+3. Create an IAM user with appropriate permissions
+4. Set up AWS Organizations for multi-account management
 
-3. **Supporting Services**
-   - Message Queue (RabbitMQ)
-   - Search Engine (Elasticsearch)
-   - File Storage (S3/MinIO)
-   - Monitoring Stack
+### Required AWS Services
+- Amazon ECS
+- Amazon RDS
+- Amazon ElastiCache
+- Amazon S3
+- Amazon CloudFront
+- Amazon Route 53
+- AWS Certificate Manager
+- AWS Secrets Manager
 
-## Environment Variables Configuration
+## Environment Setup
 
-### Core Application Variables
+### 1. Clone the Repository
+```bash
+git clone https://github.com/faithtech/blueprint.git
+cd blueprint
+```
 
+### 2. Install Dependencies
+```bash
+# Install Node.js dependencies
+npm install
+
+# Install Terraform providers
+terraform init
+```
+
+### 3. Configure Environment Variables
+Create a `.env` file in the root directory:
 ```env
-# Application
-NODE_ENV=production
-APP_NAME=faithtech-blueprint
-APP_VERSION=1.0.0
-API_VERSION=v1
-PORT=3000
+# AWS Configuration
+AWS_REGION=us-east-1
+AWS_PROFILE=default
 
-# Security
-JWT_SECRET=your-secure-jwt-secret
-JWT_EXPIRY=24h
-COOKIE_SECRET=your-secure-cookie-secret
-CORS_ORIGINS=https://faithtech-blueprint.com,https://api.faithtech-blueprint.com
+# Database Configuration
+DB_HOST=your-db-host
+DB_PORT=5432
+DB_NAME=faithtech
+DB_USER=admin
+DB_PASSWORD=your-password
 
-# Database
-POSTGRES_HOST=db.faithtech-blueprint.com
-POSTGRES_PORT=5432
-POSTGRES_DB=faithtech_prod
-POSTGRES_USER=faithtech_user
-POSTGRES_PASSWORD=secure-db-password
-
-# Redis Cache
-REDIS_HOST=cache.faithtech-blueprint.com
+# Redis Configuration
+REDIS_HOST=your-redis-host
 REDIS_PORT=6379
-REDIS_PASSWORD=secure-redis-password
+REDIS_PASSWORD=your-password
 
-# MongoDB
-MONGO_URI=mongodb://user:pass@mongo.faithtech-blueprint.com:27017/faithtech_prod
-
-# Message Queue
-RABBITMQ_HOST=mq.faithtech-blueprint.com
-RABBITMQ_PORT=5672
-RABBITMQ_USER=faithtech_mq
-RABBITMQ_PASS=secure-mq-password
-
-# Storage
-S3_BUCKET=faithtech-prod
-S3_REGION=us-east-1
-S3_ACCESS_KEY=your-s3-access-key
-S3_SECRET_KEY=your-s3-secret-key
-
-# External Services
-STRIPE_SECRET_KEY=sk_live_your-stripe-key
-STRIPE_WEBHOOK_SECRET=whsec_your-webhook-secret
-
-# Monitoring
-SENTRY_DSN=https://your-sentry-dsn
-NEW_RELIC_LICENSE_KEY=your-newrelic-key
+# Application Configuration
+NODE_ENV=production
+PORT=3000
+API_URL=https://api.faithtech.com
+FRONTEND_URL=https://faithtech.com
 ```
 
-### Environment-Specific Configuration
+### 4. Set Up Secrets
+```bash
+# Store database credentials in AWS Secrets Manager
+aws secretsmanager create-secret \
+  --name faithtech/db-credentials \
+  --secret-string '{"username":"admin","password":"your-password"}'
 
-Create separate `.env` files for different environments:
-- `.env.production`
-- `.env.staging`
-- `.env.development`
-
-## Docker Production Builds
-
-### Base Docker Configuration
-
-```dockerfile
-# Base image
-FROM node:18-alpine as builder
-
-# Build arguments
-ARG NODE_ENV=production
-ARG APP_VERSION=1.0.0
-
-# Environment variables
-ENV NODE_ENV=${NODE_ENV}
-ENV APP_VERSION=${APP_VERSION}
-
-# Set working directory
-WORKDIR /app
-
-# Copy package files
-COPY package*.json ./
-
-# Install dependencies
-RUN npm ci --only=production
-
-# Copy application files
-COPY . .
-
-# Build application
-RUN npm run build
-
-# Production image
-FROM node:18-alpine
-
-# Copy built files from builder
-COPY --from=builder /app/dist /app
-COPY --from=builder /app/node_modules /app/node_modules
-
-# Set working directory
-WORKDIR /app
-
-# Expose port
-EXPOSE 3000
-
-# Start application
-CMD ["node", "server.js"]
+# Store Redis credentials
+aws secretsmanager create-secret \
+  --name faithtech/redis-credentials \
+  --secret-string '{"password":"your-password"}'
 ```
 
-### Docker Compose Production Setup
+## Infrastructure Deployment
 
-```yaml
-version: '3.8'
-
-services:
-  nginx:
-    image: nginx:alpine
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx/conf.d:/etc/nginx/conf.d
-      - ./certbot/conf:/etc/letsencrypt
-    depends_on:
-      - api-gateway
-
-  api-gateway:
-    build:
-      context: ./api-gateway
-      dockerfile: Dockerfile.prod
-    environment:
-      - NODE_ENV=production
-    depends_on:
-      - user-service
-      - subscription-service
-
-  user-service:
-    build:
-      context: ./services/user-service
-      dockerfile: Dockerfile.prod
-    environment:
-      - NODE_ENV=production
-    depends_on:
-      - postgres
-      - redis
-
-  subscription-service:
-    build:
-      context: ./services/subscription-service
-      dockerfile: Dockerfile.prod
-    environment:
-      - NODE_ENV=production
-    depends_on:
-      - postgres
-      - redis
-      - rabbitmq
-
-  postgres:
-    image: postgres:15-alpine
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    environment:
-      - POSTGRES_DB=${POSTGRES_DB}
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-
-  redis:
-    image: redis:7-alpine
-    volumes:
-      - redis_data:/data
-    command: redis-server --requirepass ${REDIS_PASSWORD}
-
-  rabbitmq:
-    image: rabbitmq:3-management-alpine
-    volumes:
-      - rabbitmq_data:/var/lib/rabbitmq
-    environment:
-      - RABBITMQ_DEFAULT_USER=${RABBITMQ_USER}
-      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASS}
-
-volumes:
-  postgres_data:
-  redis_data:
-  rabbitmq_data:
+### 1. Initialize Terraform
+```bash
+cd infrastructure/aws
+terraform init
 ```
 
-## CI/CD Pipeline Setup
-
-### GitHub Actions Workflow
-
-```yaml
-name: Production Deployment
-
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
-
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-      - name: Install dependencies
-        run: npm ci
-      - name: Run tests
-        run: npm run test:ci
-      - name: Run linting
-        run: npm run lint
-      - name: Check types
-        run: npm run type-check
-
-  build:
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Build Docker images
-        run: docker-compose -f docker-compose.prod.yml build
-      - name: Login to Docker Hub
-        run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-      - name: Push Docker images
-        run: docker-compose -f docker-compose.prod.yml push
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Deploy to production
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.PROD_HOST }}
-          username: ${{ secrets.PROD_USERNAME }}
-          key: ${{ secrets.PROD_SSH_KEY }}
-          script: |
-            cd /opt/faithtech-blueprint
-            docker-compose -f docker-compose.prod.yml pull
-            docker-compose -f docker-compose.prod.yml up -d
-            docker system prune -f
+### 2. Create Terraform Workspace
+```bash
+terraform workspace new production
 ```
 
-## Production Deployment Checklist
-
-1. **Pre-deployment**
-   - [ ] Run full test suite
-   - [ ] Check security vulnerabilities
-   - [ ] Update environment variables
-   - [ ] Backup database
-   - [ ] Update documentation
-
-2. **Deployment**
-   - [ ] Scale down services
-   - [ ] Deploy database migrations
-   - [ ] Deploy new containers
-   - [ ] Scale up services
-   - [ ] Verify health checks
-
-3. **Post-deployment**
-   - [ ] Monitor error rates
-   - [ ] Check performance metrics
-   - [ ] Verify integrations
-   - [ ] Test critical flows
-   - [ ] Update status page
-
-## Monitoring and Maintenance
-
-### Health Checks
-
-```javascript
-// health-check.js
-const healthCheck = {
-  uptime: process.uptime(),
-  message: 'OK',
-  timestamp: Date.now(),
-  services: {
-    database: 'OK',
-    redis: 'OK',
-    rabbitmq: 'OK'
-  }
-};
-
-app.get('/health', (req, res) => {
-  res.json(healthCheck);
-});
+### 3. Plan Infrastructure Changes
+```bash
+terraform plan -var-file=production.tfvars
 ```
 
-### Logging Configuration
-
-```javascript
-// logging.js
-const winston = require('winston');
-
-const logger = winston.createLogger({
-  level: 'info',
-  format: winston.format.json(),
-  defaultMeta: { service: 'faithtech-blueprint' },
-  transports: [
-    new winston.transports.File({ filename: 'error.log', level: 'error' }),
-    new winston.transports.File({ filename: 'combined.log' })
-  ]
-});
+### 4. Apply Infrastructure Changes
+```bash
+terraform apply -var-file=production.tfvars
 ```
 
-## Rollback Procedures
+### 5. Verify Infrastructure
+```bash
+# Check ECS cluster status
+aws ecs describe-clusters --clusters faithtech-cluster
 
-1. **Quick Rollback**
-   ```bash
-   # Revert to previous version
-   docker-compose -f docker-compose.prod.yml down
-   docker-compose -f docker-compose.prod.yml pull
-   docker tag faithtech/app:latest faithtech/app:rollback
-   docker tag faithtech/app:previous faithtech/app:latest
-   docker-compose -f docker-compose.prod.yml up -d
-   ```
+# Check RDS instance status
+aws rds describe-db-instances --db-instance-identifier faithtech-db
 
-2. **Database Rollback**
-   ```bash
-   # Restore from backup
-   pg_restore -h $DB_HOST -U $DB_USER -d $DB_NAME backup.sql
-   ```
+# Check ElastiCache cluster status
+aws elasticache describe-replication-groups --replication-group-id faithtech-cache
+```
 
-## Security Considerations
+## Application Deployment
 
-1. **SSL/TLS Configuration**
-   - Use Let's Encrypt for SSL certificates
-   - Configure HTTPS redirects
-   - Set up HSTS headers
-   - Enable HTTP/2
+### 1. Build Docker Images
+```bash
+# Build API image
+docker build -t faithtech/api:latest -f services/api/Dockerfile .
 
-2. **Firewall Rules**
-   - Restrict access to admin panels
-   - Configure rate limiting
-   - Set up IP whitelisting
-   - Enable DDoS protection
+# Build Frontend image
+docker build -t faithtech/frontend:latest -f services/frontend/Dockerfile .
+```
 
-3. **Secrets Management**
-   - Use environment variables
-   - Implement vault service
-   - Rotate credentials regularly
-   - Monitor access logs
+### 2. Push Images to ECR
+```bash
+# Login to ECR
+aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com
 
-## Support and Troubleshooting
+# Push images
+docker push $AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/faithtech/api:latest
+docker push $AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/faithtech/frontend:latest
+```
+
+### 3. Deploy to ECS
+```bash
+# Update ECS service
+aws ecs update-service \
+  --cluster faithtech-cluster \
+  --service api-service \
+  --force-new-deployment
+
+# Check deployment status
+aws ecs describe-services \
+  --cluster faithtech-cluster \
+  --services api-service
+```
+
+### 4. Verify Application
+```bash
+# Check API health
+curl https://api.faithtech.com/health
+
+# Check frontend deployment
+curl -I https://faithtech.com
+```
+
+## Database Migration
+
+### 1. Backup Existing Database
+```bash
+# Create RDS snapshot
+aws rds create-db-snapshot \
+  --db-snapshot-identifier faithtech-snapshot \
+  --db-instance-identifier faithtech-db
+```
+
+### 2. Run Migrations
+```bash
+# Run database migrations
+npm run migrate:up
+
+# Verify migrations
+npm run migrate:status
+```
+
+### 3. Seed Initial Data
+```bash
+# Run seeders
+npm run seed:production
+```
+
+## Monitoring Setup
+
+### 1. Configure CloudWatch
+```bash
+# Create CloudWatch dashboard
+aws cloudwatch put-dashboard \
+  --dashboard-name faithtech-dashboard \
+  --dashboard-body file://monitoring/dashboard.json
+```
+
+### 2. Set Up Alarms
+```bash
+# Create CPU utilization alarm
+aws cloudwatch put-metric-alarm \
+  --alarm-name faithtech-high-cpu \
+  --alarm-description "High CPU utilization" \
+  --metric-name CPUUtilization \
+  --namespace AWS/ECS \
+  --statistic Average \
+  --period 300 \
+  --threshold 80 \
+  --comparison-operator GreaterThanThreshold \
+  --dimensions Name=ClusterName,Value=faithtech-cluster \
+  --evaluation-periods 2 \
+  --alarm-actions arn:aws:sns:us-east-1:$AWS_ACCOUNT_ID:faithtech-alerts
+```
+
+### 3. Configure Logging
+```bash
+# Create log groups
+aws logs create-log-group --log-group-name /faithtech/api
+aws logs create-log-group --log-group-name /faithtech/frontend
+
+# Set retention period
+aws logs put-retention-policy \
+  --log-group-name /faithtech/api \
+  --retention-in-days 30
+```
+
+## Security Configuration
+
+### 1. Set Up WAF
+```bash
+# Create WAF rules
+aws wafv2 create-web-acl \
+  --name faithtech-waf \
+  --scope REGIONAL \
+  --default-action Allow \
+  --visibility-config SampledRequestsEnabled=true,CloudWatchMetricsEnabled=true \
+  --rules file://security/waf-rules.json
+```
+
+### 2. Configure SSL/TLS
+```bash
+# Request SSL certificate
+aws acm request-certificate \
+  --domain-name faithtech.com \
+  --validation-method DNS \
+  --subject-alternative-names *.faithtech.com
+```
+
+### 3. Set Up Security Groups
+```bash
+# Create security group for API
+aws ec2 create-security-group \
+  --group-name faithtech-api-sg \
+  --description "Security group for FaithTech API"
+
+# Add inbound rules
+aws ec2 authorize-security-group-ingress \
+  --group-name faithtech-api-sg \
+  --protocol tcp \
+  --port 443 \
+  --cidr 0.0.0.0/0
+```
+
+## Troubleshooting
 
 ### Common Issues
 
-1. **Container Issues**
-   ```bash
-   # Check container logs
-   docker logs container_name
-   
-   # Check container status
-   docker ps -a
-   ```
+#### 1. ECS Service Deployment Fails
+```bash
+# Check service events
+aws ecs describe-services \
+  --cluster faithtech-cluster \
+  --services api-service
 
-2. **Database Issues**
-   ```bash
-   # Check database connections
-   pg_isready -h $DB_HOST -p $DB_PORT
-   
-   # Monitor active connections
-   SELECT * FROM pg_stat_activity;
-   ```
+# Check container logs
+aws logs get-log-events \
+  --log-group-name /faithtech/api \
+  --log-stream-name api-service/container-name
+```
 
-### Contact Information
+#### 2. Database Connection Issues
+```bash
+# Check RDS instance status
+aws rds describe-db-instances \
+  --db-instance-identifier faithtech-db
 
-- DevOps Team: devops@faithtech-blueprint.com
-- Emergency Support: +1-800-FAITH-TECH
-- Status Page: status.faithtech-blueprint.com 
+# Test database connection
+psql -h your-db-host -U admin -d faithtech
+```
+
+#### 3. SSL Certificate Issues
+```bash
+# Check certificate status
+aws acm describe-certificate \
+  --certificate-arn arn:aws:acm:us-east-1:$AWS_ACCOUNT_ID:certificate/xxx
+
+# Verify DNS validation
+dig _acm-validation.faithtech.com
+```
+
+### Monitoring and Debugging
+
+#### 1. Check Application Logs
+```bash
+# View API logs
+aws logs tail /faithtech/api
+
+# View frontend logs
+aws logs tail /faithtech/frontend
+```
+
+#### 2. Monitor Metrics
+```bash
+# Get CPU utilization
+aws cloudwatch get-metric-statistics \
+  --namespace AWS/ECS \
+  --metric-name CPUUtilization \
+  --dimensions Name=ClusterName,Value=faithtech-cluster \
+  --start-time $(date -u +"%Y-%m-%dT%H:%M:%SZ" -d "-1 hour") \
+  --end-time $(date -u +"%Y-%m-%dT%H:%M:%SZ") \
+  --period 300 \
+  --statistics Average
+```
+
+#### 3. Check Security Groups
+```bash
+# Describe security groups
+aws ec2 describe-security-groups \
+  --group-ids sg-xxx
+
+# Check network ACLs
+aws ec2 describe-network-acls
+```
+
+### Recovery Procedures
+
+#### 1. Database Recovery
+```bash
+# Restore from snapshot
+aws rds restore-db-instance-from-db-snapshot \
+  --db-instance-identifier faithtech-db-restore \
+  --db-snapshot-identifier faithtech-snapshot
+```
+
+#### 2. Application Rollback
+```bash
+# Rollback ECS service
+aws ecs update-service \
+  --cluster faithtech-cluster \
+  --service api-service \
+  --task-definition arn:aws:ecs:us-east-1:$AWS_ACCOUNT_ID:task-definition/api:1
+```
+
+#### 3. Infrastructure Rollback
+```bash
+# Rollback Terraform changes
+terraform apply -var-file=production.tfvars -target=module.previous_version
+```
+
+## Support
+
+For additional support:
+1. Check the [Documentation](https://docs.faithtech.com)
+2. Join our [Community Forum](https://community.faithtech.com)
+3. Contact [Support](https://faithtech.com/support)
+4. Submit [Issues](https://github.com/faithtech/blueprint/issues) 

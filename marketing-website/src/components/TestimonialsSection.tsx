@@ -20,7 +20,7 @@ const testimonials: Testimonial[] = [
   },
   {
     quote:
-      'The analytics features have given us valuable insights into our ministry's growth. We can now make data-driven decisions to better serve our community.',
+      'The analytics features have given us valuable insights into our ministry\'s growth. We can now make data-driven decisions to better serve our community.',
     author: 'Michael Chen',
     role: 'Lead Pastor',
     church: 'New Life Fellowship',
@@ -28,7 +28,7 @@ const testimonials: Testimonial[] = [
   },
   {
     quote:
-      'Our volunteers love the mobile app. It's made coordinating Sunday services and special events so much easier. The platform is truly a game-changer.',
+      'Our volunteers love the mobile app. It\'s made coordinating Sunday services and special events so much easier. The platform is truly a game-changer.',
     author: 'David Rodriguez',
     role: 'Volunteer Coordinator',
     church: 'Hope Community Church',
@@ -62,8 +62,8 @@ const TestimonialsSection = () => {
                       <Image
                         src={testimonial.image}
                         alt={testimonial.author}
-                        layout="fill"
-                        objectFit="cover"
+                        fill
+                        style={{ objectFit: "cover" }}
                       />
                     </div>
                   </div>
@@ -109,4 +109,4 @@ const TestimonialsSection = () => {
   );
 };
 
-export default TestimonialsSection; 
+export default TestimonialsSection;

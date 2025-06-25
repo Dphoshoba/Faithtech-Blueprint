@@ -55,7 +55,7 @@ jobs:
           locust -f locustfile.py --headless -u 100 -r 10 -t 1m
 
       - name: Upload load test results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: load-test-results

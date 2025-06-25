@@ -1,0 +1,374 @@
+export const campaignTemplates = {
+  // Small Churches (Under 200 Members)
+  smallChurch: {
+    email: {
+      subject: 'Big Church Technology Impact on a Small Church Budget',
+      body: `Hi [Name],
+
+I understand the unique challenges small churches face with technology. You need maximum impact from minimal investment, and you can't afford expensive mistakes.
+
+That's why I created FaithTech Blueprint specifically with churches like [Church Name] in mind.
+
+What you'll get:
+✅ Simple, affordable technology solutions
+✅ Templates that prevent reinventing the wheel
+✅ Step-by-step implementation guides
+✅ Support from someone who understands small church ministry
+
+Join 50+ small churches already using FaithTech Blueprint to:
+• Reduce administrative time by 12 hours/week
+• Increase online engagement by 89%
+• Save thousands on technology decisions
+
+Take our free assessment to see how we can help your church:
+[Assessment Link]
+
+Blessings,
+David George
+Founder, FaithTech Blueprint`,
+    },
+    social: {
+      facebook: `Small church? Big impact.
+
+FaithTech Blueprint helps churches under 200 members achieve big church technology results on a small church budget.
+
+✅ Affordable solutions
+✅ Simple implementation
+✅ Maximum ministry impact
+
+Join 50+ small churches already seeing results.
+
+Take our free assessment: [Link]`,
+      linkedin: `Small Church Technology Strategy
+
+Most technology solutions are built for large churches, leaving small churches behind.
+
+FaithTech Blueprint changes that.
+
+We help churches under 200 members:
+• Implement affordable technology solutions
+• Save time on administrative tasks
+• Increase ministry effectiveness
+• Make confident technology decisions
+
+Join 50+ small churches already using our platform.`,
+    },
+  },
+
+  // Growing Churches (200-800 Members)
+  growingChurch: {
+    email: {
+      subject: 'Scale Your Systems Before They Break Your Growth',
+      body: `Hi [Name],
+
+I've worked with many growing churches like [Church Name], and I understand the challenges you're facing. Your current systems are starting to show cracks, and you need solutions that can scale with your growth.
+
+FaithTech Blueprint helps growing churches:
+✅ Scale technology infrastructure
+✅ Optimize workflows for multiple staff
+✅ Integrate systems seamlessly
+✅ Plan for sustainable growth
+
+Join 100+ growing churches already using our platform to:
+• Reduce system bottlenecks by 75%
+• Increase staff productivity by 40%
+• Save $15,000+ on technology decisions
+
+Take our free assessment to see how we can help your church scale:
+[Assessment Link]
+
+Blessings,
+David George
+Founder, FaithTech Blueprint`,
+    },
+    social: {
+      facebook: `Growing Church? Scale Your Systems.
+
+FaithTech Blueprint helps churches with 200-800 members scale their technology infrastructure before it breaks their growth.
+
+✅ Scalable solutions
+✅ Staff coordination
+✅ Growth planning
+
+Join 100+ growing churches already seeing results.
+
+Take our free assessment: [Link]`,
+      linkedin: `Church Growth Technology Strategy
+
+Growing churches need technology solutions that scale with their ministry.
+
+FaithTech Blueprint helps churches with 200-800 members:
+• Scale technology infrastructure
+• Coordinate multiple staff members
+• Plan for sustainable growth
+• Integrate systems seamlessly
+
+Join 100+ growing churches already using our platform.`,
+    },
+  },
+
+  // Established Churches (800+ Members)
+  establishedChurch: {
+    email: {
+      subject: 'Optimize and Integrate for Maximum Ministry Multiplication',
+      body: `Hi [Name],
+
+Large churches like [Church Name] face unique technology challenges. You need enterprise-level solutions that can handle complex operations across multiple campuses and large volunteer teams.
+
+FaithTech Blueprint helps established churches:
+✅ Optimize complex technology ecosystems
+✅ Coordinate multi-campus operations
+✅ Manage large volunteer teams
+✅ Implement advanced integrations
+
+Join 50+ established churches already using our platform to:
+• Reduce operational costs by 30%
+• Increase volunteer engagement by 60%
+• Streamline multi-campus operations
+• Save $50,000+ on technology decisions
+
+Take our free assessment to see how we can help your church optimize:
+[Assessment Link]
+
+Blessings,
+David George
+Founder, FaithTech Blueprint`,
+    },
+    social: {
+      facebook: `Established Church? Optimize Your Systems.
+
+FaithTech Blueprint helps churches with 800+ members optimize their technology ecosystem for maximum ministry impact.
+
+✅ Enterprise solutions
+✅ Multi-campus coordination
+✅ Advanced integrations
+
+Join 50+ established churches already seeing results.
+
+Take our free assessment: [Link]`,
+      linkedin: `Enterprise Church Technology Strategy
+
+Large churches need enterprise-level technology solutions that can handle complex operations.
+
+FaithTech Blueprint helps churches with 800+ members:
+• Optimize technology ecosystems
+• Coordinate multi-campus operations
+• Manage large volunteer teams
+• Implement advanced integrations
+
+Join 50+ established churches already using our platform.`,
+    },
+  },
+
+  // Church Plants and Restarts
+  churchPlant: {
+    email: {
+      subject: 'Start with the Right Foundation from Day One',
+      body: `Hi [Name],
+
+Starting a new church or restarting an existing one? You have a unique opportunity to build your technology infrastructure from the ground up.
+
+FaithTech Blueprint helps church plants and restarts:
+✅ Build scalable technology foundations
+✅ Make smart initial technology choices
+✅ Implement proven frameworks
+✅ Avoid common pitfalls
+
+Join 30+ church plants already using our platform to:
+• Launch with professional systems
+• Save $20,000+ on technology setup
+• Scale efficiently as you grow
+• Focus on ministry, not technology
+
+Take our free assessment to see how we can help your church start strong:
+[Assessment Link]
+
+Blessings,
+David George
+Founder, FaithTech Blueprint`,
+    },
+    social: {
+      facebook: `Church Plant? Start Strong.
+
+FaithTech Blueprint helps church plants and restarts build the right technology foundation from day one.
+
+✅ Scalable foundations
+✅ Smart initial choices
+✅ Proven frameworks
+
+Join 30+ church plants already seeing results.
+
+Take our free assessment: [Link]`,
+      linkedin: `Church Plant Technology Strategy
+
+New churches have a unique opportunity to build their technology infrastructure from the ground up.
+
+FaithTech Blueprint helps church plants and restarts:
+• Build scalable technology foundations
+• Make smart initial technology choices
+• Implement proven frameworks
+• Avoid common pitfalls
+
+Join 30+ church plants already using our platform.`,
+    },
+  },
+
+  // Beta Program
+  betaProgram: {
+    email: {
+      subject: 'You helped us build it - now we're launching!',
+      body: `Hi [Name],
+
+Six months ago, you took a chance on an early version of FaithTech Blueprint. Today, I'm thrilled to announce that we're officially launching to the public - and it's because of feedback from churches like [Church Name] that we're ready.
+
+Here's what's new since your beta experience:
+✅ Enhanced AI recommendations
+✅ New integrations with Planning Center, Church Community Builder, and Tithe.ly
+✅ Mobile-optimized experience
+✅ Advanced analytics dashboard
+✅ Improved user interface
+
+As a founding beta partner, you'll continue to receive:
+• Lifetime 50% discount on all subscription plans
+• Priority access to new features
+• Direct line to our development team
+• Annual strategy session with our ministry technology team
+
+We'd love to feature [Church Name]'s success story. Would you be interested in a brief case study showcasing how FaithTech Blueprint has impacted your ministry?
+
+Ready to upgrade to the full platform? Your beta access will automatically transition, and you'll see all the new features when you log in.
+
+Thank you for believing in this vision when it was just an idea. Churches across the country will benefit from the feedback you provided.
+
+Blessings,
+David George
+Founder, FaithTech Blueprint
+
+P.S. Know another church that could benefit? Forward this email - they'll get a 30-day free trial when they mention your church.`,
+    },
+  },
+
+  // Waitlist
+  waitlist: {
+    email: {
+      subject: 'The wait is over - FaithTech Blueprint is here',
+      body: `Hi [Name],
+
+Remember when you signed up to be notified about FaithTech Blueprint? That day has arrived.
+
+After months of beta testing with 200+ churches, we're officially launching the platform that's helping churches like yours make confident technology decisions.
+
+Here's what you'll get immediate access to:
+
+🎯 MINISTRY TECHNOLOGY ASSESSMENT
+Take our 15-minute assessment and get a personalized roadmap for your church's digital ministry strategy.
+
+📋 PROVEN TEMPLATE LIBRARY
+Access 50+ templates used by successful churches, including:
+- Website optimization checklists
+- Digital giving enhancement guides
+- Volunteer management workflows
+- First-time visitor journey maps
+
+🔧 CHURCH SYSTEM INTEGRATIONS
+Connect with Planning Center, Church Community Builder, Tithe.ly, and other popular church management systems.
+
+📊 PROGRESS TRACKING
+Monitor your implementation progress and see measurable improvements in your ministry effectiveness.
+
+SPECIAL LAUNCH OFFER:
+As a thank-you for your early interest, use code EARLYBIRD for 50% off your first three months.
+
+Ready to get started? Choose the plan that fits your church:
+
+[CTA Button: Get Started - Free Assessment]
+
+Questions? Reply to this email - I personally read and respond to every message.
+
+Excited to serve your ministry,
+David George
+Pastor & Founder, FaithTech Blueprint`,
+    },
+  },
+
+  // Church Leaders
+  churchLeaders: {
+    email: {
+      subject: 'From one church leader to another...',
+      body: `Hi [Name],
+
+Church leadership is hard enough without having to become a technology expert too.
+
+I'm David George, pastor at [Church Name] and the founder of something I wish had existed when I started in ministry: FaithTech Blueprint.
+
+After serving in pastoral roles for 10+ years and moonlighting as a software developer, I kept seeing the same pattern: great churches making poor technology decisions not because they lacked wisdom, but because they lacked a framework.
+
+So I built one.
+
+FaithTech Blueprint is the platform I wish every church leadership team had access to:
+
+✅ 15-minute assessment that reveals your technology blind spots
+✅ Strategic roadmap tailored to your ministry context and budget
+✅ Proven templates from churches that got it right
+✅ Integration guidance for your existing systems
+
+This isn't another piece of church software - it's a strategic partner for technology decisions.
+
+The results from our beta churches speak for themselves:
+• 78% of churches implemented at least three major technology improvements
+• Average technology ROI increased by 245% within six months
+• Administrative time reduced by an average of 12 hours per week
+• Online engagement increased by an average of 89%
+
+I'm offering a free assessment to church leaders in our launch week. No obligation, just actionable insights for your ministry.
+
+[CTA Button: Take Free Assessment]
+
+The assessment takes 15 minutes and gives you a personalized report you can present to your leadership team.
+
+Grace and peace,
+David George
+Pastor & Founder, FaithTech Blueprint
+
+P.S. If you're not ready for an assessment but want to stay updated on church technology best practices, I send a weekly email with practical insights. [Subscribe here].`,
+    },
+  },
+};
+
+export const emailTemplates = {
+  welcome: {
+    subject: "Welcome to FaithTech Blueprint!",
+    body: `Hi [Name],
+
+Welcome to FaithTech Blueprint! We're excited to have you join our community of churches using technology to make a difference.
+
+Here's what you can do next:
+1. Complete your church profile
+2. Explore our resources
+3. Connect with other churches
+
+Let us know if you need any help getting started!
+
+Best regards,
+The FaithTech Blueprint Team`
+  },
+  betaAnnouncement: {
+    subject: "You helped us build it - now we're launching!",
+    body: `Hi [Name],
+
+We're thrilled to announce that FaithTech Blueprint is officially launching! Thanks to your valuable feedback during our beta phase, we've created a platform that truly serves the needs of churches.
+
+What's new:
+- Enhanced church profiles
+- Improved resource sharing
+- Better community features
+- New analytics dashboard
+
+Log in to explore the new features!
+
+Best regards,
+The FaithTech Blueprint Team
+
+P.S. Know another church that could benefit? Forward this email - they'll get a 30-day free trial when they mention your church.`
+  }
+}; 

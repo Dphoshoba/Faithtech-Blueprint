@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { FaChurch, FaUsers, FaHandshake, FaChartLine } from 'react-icons/fa';
+import FeatureCard from '../components/FeatureCard';
 
 interface LeadFormData {
   name: string;
@@ -12,11 +13,53 @@ interface LeadFormData {
 }
 
 export default function Home() {
-  const { register, handleSubmit, formState: { errors } } = useForm<LeadFormData>();
+  const { register, handleSubmit, formState: { errors }, reset } = useForm<LeadFormData>();
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<{
+    type: 'success' | 'error' | null;
+    message: string;
+  }>({ type: null, message: '' });
 
   const onSubmit = async (data: LeadFormData) => {
-    // TODO: Implement lead capture
-    console.log(data);
+    try {
+      setIsSubmitting(true);
+      setSubmitStatus({ type: null, message: '' });
+      
+      // Send lead data to API
+      const response = await fetch('/api/leads', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+      
+      const result = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(result.message || 'Failed to submit form');
+      }
+      
+      // Show success message
+      setSubmitStatus({
+        type: 'success',
+        message: 'Thank you for your interest! We will contact you soon.'
+      });
+      
+      // Reset form
+      reset();
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      setSubmitStatus({
+        type: 'error',
+        message: error instanceof Error 
+          ? error.message 
+          : 'There was an error submitting your request. Please try again later.'
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -81,7 +124,7 @@ export default function Home() {
           <p className="text-xl text-gray-600 text-center mb-12">
             See how Faithtech can help your church thrive in the digital age.
           </p>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          <form id="lead-form" onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <div>
               <label className="block text-gray-700 mb-2">Name</label>
               <input
@@ -128,11 +171,22 @@ export default function Home() {
                 rows={4}
               />
             </div>
+            {submitStatus.type && (
+              <div className={`p-4 mb-4 rounded-lg ${
+                submitStatus.type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+              }`}>
+                {submitStatus.message}
+              </div>
+            )}
+            
             <button
               type="submit"
-              className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+              disabled={isSubmitting}
+              className={`w-full bg-blue-600 text-white py-3 rounded-lg font-semibold 
+                ${isSubmitting ? 'opacity-70 cursor-not-allowed' : 'hover:bg-blue-700'} 
+                transition-colors`}
             >
-              Request Demo
+              {isSubmitting ? 'Submitting...' : 'Request Demo'}
             </button>
           </form>
         </div>
@@ -140,16 +194,3 @@ export default function Home() {
     </div>
   );
 }
-
-function FeatureCard({ icon, title, description }: { icon: React.ReactNode; title: string; description: string }) {
-  return (
-    <motion.div
-      whileHover={{ y: -10 }}
-      className="p-6 bg-white rounded-xl shadow-lg"
-    >
-      <div className="mb-4">{icon}</div>
-      <h3 className="text-xl font-semibold mb-2">{title}</h3>
-      <p className="text-gray-600">{description}</p>
-    </motion.div>
-  );
-} 

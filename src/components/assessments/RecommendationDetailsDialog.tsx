@@ -176,7 +176,7 @@ const RecommendationDetailsDialog: React.FC<RecommendationDetailsDialogProps> = 
                       rows={2}
                       label="Add Note"
                       value={note}
-                      onChange={(e) => setNote(e.target.value)}
+                      onChange={(e) => setNote((e.target as HTMLTextAreaElement).value)}
                     />
                     <Button
                       variant="contained"
