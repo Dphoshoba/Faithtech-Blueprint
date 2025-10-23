@@ -20,11 +20,28 @@ jobs:
         with:
           node-version: '18'
 
+      - name: Check package-lock.json
+        run: |
+          if [ -f package-lock.json ]; then
+            echo "package-lock.json exists"
+            ls -la package-lock.json
+          else
+            echo "package-lock.json not found, will use npm install"
+          fi
+
       - name: Install dependencies
         run: |
-          if ! npm ci; then
-            echo "npm ci failed, falling back to npm install"
-            npm install
+          if [ -f package-lock.json ]; then
+            echo "Attempting npm ci..."
+            if npm ci --prefer-offline --no-audit; then
+              echo "npm ci succeeded"
+            else
+              echo "npm ci failed, falling back to npm install"
+              npm install --prefer-offline --no-audit
+            fi
+          else
+            echo "No package-lock.json found, using npm install"
+            npm install --prefer-offline --no-audit
           fi
 
       - name: Run unit tests
