@@ -14,8 +14,8 @@
     "start": "cd client && npm start",
     "lint": "cd client && npm run build 2>&1 | grep -E '(error|warning)' || echo 'Lint check complete'",
     "test": "cd client && npm test",
-    "test:ci": "cd client && npm run test -- --coverage --watchAll=false",
-    "type-check": "cd client && npx tsc --noEmit",
+    "test:ci": "cd client && npm run test:ci",
+    "type-check": "cd client && npm run type-check",
     "clean": "rimraf client/build client/node_modules/.cache",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md}\" --ignore-path .gitignore",
     "install:all": "npm install && cd client && npm install"
