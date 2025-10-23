@@ -27,12 +27,16 @@ jobs:
       - name: Install dependencies (User Service)
         working-directory: ./services/user-service
         run: |
+          echo "Cleaning npm cache for user service..."
+          npm cache clean --force
+          
           echo "Attempting npm ci for user service..."
-          if npm ci --prefer-offline --no-audit; then
+          if npm ci --prefer-offline --no-audit --no-fund; then
             echo "npm ci succeeded for user service"
           else
             echo "npm ci failed, falling back to npm install"
-            npm install --prefer-offline --no-audit
+            rm -f package-lock.json
+            npm install --prefer-offline --no-audit --no-fund
           fi
 
       - name: Run tests (User Service)
@@ -45,12 +49,16 @@ jobs:
       - name: Install dependencies (Frontend)
         working-directory: ./client
         run: |
+          echo "Cleaning npm cache for frontend..."
+          npm cache clean --force
+          
           echo "Attempting npm ci for frontend..."
-          if npm ci --prefer-offline --no-audit; then
+          if npm ci --prefer-offline --no-audit --no-fund; then
             echo "npm ci succeeded for frontend"
           else
             echo "npm ci failed, falling back to npm install"
-            npm install --prefer-offline --no-audit
+            rm -f package-lock.json
+            npm install --prefer-offline --no-audit --no-fund
           fi
 
       - name: Run tests (Frontend)

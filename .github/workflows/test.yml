@@ -31,17 +31,21 @@ jobs:
 
       - name: Install dependencies
         run: |
+          echo "Cleaning npm cache..."
+          npm cache clean --force
+          
           if [ -f package-lock.json ]; then
             echo "Attempting npm ci..."
-            if npm ci --prefer-offline --no-audit; then
+            if npm ci --prefer-offline --no-audit --no-fund; then
               echo "npm ci succeeded"
             else
               echo "npm ci failed, falling back to npm install"
-              npm install --prefer-offline --no-audit
+              rm -f package-lock.json
+              npm install --prefer-offline --no-audit --no-fund
             fi
           else
             echo "No package-lock.json found, using npm install"
-            npm install --prefer-offline --no-audit
+            npm install --prefer-offline --no-audit --no-fund
           fi
 
       - name: Run unit tests
