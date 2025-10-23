@@ -55,13 +55,21 @@ router.post('/register', async (req, res) => {
 
     await user.save();
 
-    // Send verification email
-    const verificationURL = `${process.env.FRONTEND_URL}/verify-email?token=${verificationToken}`;
-    await sendEmail({
-      to: email,
-      subject: 'Verify your email',
-      text: `Please verify your email by clicking on this link: ${verificationURL}`
-    });
+    // Send verification email (with timeout and error handling)
+    try {
+      const verificationURL = `${process.env.FRONTEND_URL}/verify-email?token=${verificationToken}`;
+      await Promise.race([
+        sendEmail({
+          to: email,
+          subject: 'Verify your email',
+          text: `Please verify your email by clicking on this link: ${verificationURL}`
+        }),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Email timeout')), 5000))
+      ]);
+    } catch (emailError) {
+      console.log('Email sending failed (continuing with registration):', emailError.message);
+      // Continue with registration even if email fails
+    }
 
     // Generate JWT
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '24h' });
@@ -176,12 +184,21 @@ router.post('/forgot-password', async (req, res) => {
     user.passwordResetExpires = Date.now() + 60 * 60 * 1000; // 1 hour
     await user.save();
 
-    const resetURL = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
-    await sendEmail({
-      to: user.email,
-      subject: 'Reset your password',
-      text: `Click this link to reset your password: ${resetURL}`
-    });
+    // Send password reset email (with timeout and error handling)
+    try {
+      const resetURL = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
+      await Promise.race([
+        sendEmail({
+          to: user.email,
+          subject: 'Reset your password',
+          text: `Click this link to reset your password: ${resetURL}`
+        }),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Email timeout')), 5000))
+      ]);
+    } catch (emailError) {
+      console.log('Email sending failed (continuing with password reset):', emailError.message);
+      // Continue even if email fails
+    }
 
     res.json({ message: 'Password reset email sent' });
   } catch (error) {

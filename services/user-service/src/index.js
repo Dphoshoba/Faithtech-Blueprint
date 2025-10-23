@@ -22,9 +22,11 @@ const {
 
 // Import routes
 const authRoutes = require('./routes/authRoutes');
+const simpleAuthRoutes = require('./routes/simple-auth');
 const userRoutes = require('./routes/userRoutes');
 const plansRouter = require('./routes/plans');
 const subscriptionsRouter = require('./routes/subscriptions');
+const assessmentsRouter = require('./routes/assessments');
 
 // Create Express app
 const app = express();
@@ -50,9 +52,11 @@ app.use('/api', apiLimiter);
 
 // API routes
 app.use('/api/auth', authRoutes);
+app.use('/api/simple-auth', simpleAuthRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/plans', plansRouter);
 app.use('/api/subscriptions', subscriptionsRouter);
+app.use('/api/assessments', assessmentsRouter);
 
 // Health check
 app.get('/health', (req, res) => {
@@ -70,6 +74,7 @@ app.get('/', (req, res) => {
       users: '/api/users',
       plans: '/api/plans',
       subscriptions: '/api/subscriptions',
+      assessments: '/api/assessments',
       health: '/health'
     }
   });

@@ -1,5 +1,3 @@
-const bcrypt = require('bcryptjs');
-
 // Extended list of common passwords
 const commonPasswords = [
   'password123', 'qwerty123', '12345678', 'letmein123', 'admin123',
@@ -96,87 +94,8 @@ const validatePasswordComplexity = (password, username = '') => {
   };
 };
 
-/**
- * Validates bcrypt hash format
- * @param {string} hash - The hash to validate
- * @returns {boolean} Whether the hash is valid
- */
-const isValidBcryptHash = (hash) => {
-  if (typeof hash !== 'string') return false;
-  
-  // BCrypt hash format: $2[aby]$[rounds]$[22 characters]
-  const parts = hash.split('$');
-  if (parts.length !== 4) return false;
-  
-  // Check algorithm identifier
-  if (!parts[1].match(/^2[aby]$/)) return false;
-  
-  // Check rounds (between 4 and 31)
-  const rounds = parseInt(parts[2]);
-  if (isNaN(rounds) || rounds < 4 || rounds > 31) return false;
-  
-  // Check hash length (22 characters)
-  if (parts[3].length !== 53) return false;
-  
-  return true;
-};
-
-/**
- * Hashes a password using bcrypt
- * @param {string} password - The plain text password
- * @param {number} rounds - The number of salt rounds (default: 12)
- * @returns {Promise<string>} The hashed password
- * @throws {Error} If password is empty, invalid, or exceeds maximum length
- */
-const hashPassword = async (password, rounds = 12) => {
-  if (!password || typeof password !== 'string') {
-    throw new Error('Error hashing password: Invalid password provided');
-  }
-
-  const trimmedPassword = password.trim();
-
-  if (trimmedPassword.length > PASSWORD_CONSTRAINTS.MAX_LENGTH) {
-    throw new Error('Error hashing password: Password exceeds maximum length');
-  }
-
-  try {
-    const salt = await bcrypt.genSalt(rounds);
-    return await bcrypt.hash(trimmedPassword, salt);
-  } catch (error) {
-    throw new Error('Error hashing password: ' + error.message);
-  }
-};
-
-/**
- * Compares a plain text password with a hashed password
- * @param {string} plainPassword - The plain text password
- * @param {string} hashedPassword - The hashed password to compare against
- * @returns {Promise<boolean>} Whether the passwords match
- * @throws {Error} If either password is invalid
- */
-const comparePasswords = async (plainPassword, hashedPassword) => {
-  if (!plainPassword || !hashedPassword || 
-      typeof plainPassword !== 'string' || 
-      typeof hashedPassword !== 'string') {
-    throw new Error('Error comparing passwords: Invalid password(s) provided');
-  }
-
-  // Validate hash format before comparison
-  if (!isValidBcryptHash(hashedPassword)) {
-    throw new Error('Error comparing passwords: Invalid hash format');
-  }
-
-  try {
-    // Trim the plain password before comparison
-    return await bcrypt.compare(plainPassword.trim(), hashedPassword);
-  } catch (error) {
-    throw new Error('Error comparing passwords: ' + error.message);
-  }
-};
-
 module.exports = {
   validatePasswordComplexity,
-  hashPassword,
-  comparePasswords,
-  PASSWORD_CONSTRAINTS // Exported for testing
-}; 
+  PASSWORD_CONSTRAINTS,
+  commonPasswords
+};
