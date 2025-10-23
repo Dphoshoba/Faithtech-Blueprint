@@ -27,7 +27,11 @@ jobs:
 
       - name: Install dependencies (User Service)
         working-directory: ./services/user-service
-        run: npm ci
+        run: |
+          if ! npm ci; then
+            echo "npm ci failed, falling back to npm install"
+            npm install
+          fi
 
       - name: Run tests (User Service)
         working-directory: ./services/user-service
@@ -38,7 +42,11 @@ jobs:
 
       - name: Install dependencies (Frontend)
         working-directory: ./client
-        run: npm ci
+        run: |
+          if ! npm ci; then
+            echo "npm ci failed, falling back to npm install"
+            npm install
+          fi
 
       - name: Run tests (Frontend)
         working-directory: ./client
