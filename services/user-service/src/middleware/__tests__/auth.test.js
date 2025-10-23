@@ -28,6 +28,7 @@ describe('Auth Middleware', () => {
 
     expect(mockRes.status).toHaveBeenCalledWith(401);
     expect(mockRes.json).toHaveBeenCalledWith({
+      success: false,
       message: 'No authentication token provided'
     });
     expect(nextFunction).not.toHaveBeenCalled();
@@ -40,6 +41,7 @@ describe('Auth Middleware', () => {
 
     expect(mockRes.status).toHaveBeenCalledWith(401);
     expect(mockRes.json).toHaveBeenCalledWith({
+      success: false,
       message: 'Invalid authentication token'
     });
     expect(nextFunction).not.toHaveBeenCalled();
@@ -61,7 +63,8 @@ describe('Auth Middleware', () => {
 
     expect(mockRes.status).toHaveBeenCalledWith(401);
     expect(mockRes.json).toHaveBeenCalledWith({
-      message: 'Token expired',
+      success: false,
+      message: 'Authentication token has expired'
     });
     expect(nextFunction).not.toHaveBeenCalled();
   });
@@ -75,16 +78,19 @@ describe('Auth Middleware', () => {
 
     expect(mockRes.status).toHaveBeenCalledWith(401);
     expect(mockRes.json).toHaveBeenCalledWith({
+      success: false,
       message: 'User not found'
     });
     expect(nextFunction).not.toHaveBeenCalled();
   });
 
   it('should set user and token in request if authentication is successful', async () => {
-    const user = { id: 'user-id', name: 'Test User' };
+    const user = { id: 'user-id', name: 'Test User', active: true };
     const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET);
     mockReq.header.mockReturnValue(`Bearer ${token}`);
-    User.findById.mockResolvedValue(user);
+    User.findById.mockReturnValue({
+      select: jest.fn().mockResolvedValue(user)
+    });
 
     await auth(mockReq, mockRes, nextFunction);
 
@@ -103,6 +109,7 @@ describe('Auth Middleware', () => {
 
     expect(mockRes.status).toHaveBeenCalledWith(500);
     expect(mockRes.json).toHaveBeenCalledWith({
+      success: false,
       message: 'Authentication error',
       error: 'Database error'
     });

@@ -94,8 +94,54 @@ const validatePasswordComplexity = (password, username = '') => {
   };
 };
 
+const bcrypt = require('bcrypt');
+
+/**
+ * Hash a password using bcrypt
+ * @param {string} password - The password to hash
+ * @param {number} saltRounds - Number of salt rounds (default: 12)
+ * @returns {Promise<string>} - The hashed password
+ */
+const hashPassword = async (password, saltRounds = 12) => {
+  try {
+    if (!password || typeof password !== 'string') {
+      throw new Error('Error hashing password');
+    }
+    
+    if (password.length > PASSWORD_CONSTRAINTS.MAX_LENGTH) {
+      throw new Error('Password exceeds maximum length');
+    }
+    
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    return hashedPassword;
+  } catch (error) {
+    throw new Error('Error hashing password');
+  }
+};
+
+/**
+ * Compare a password with its hash
+ * @param {string} password - The plain text password
+ * @param {string} hashedPassword - The hashed password to compare against
+ * @returns {Promise<boolean>} - True if passwords match, false otherwise
+ */
+const comparePasswords = async (password, hashedPassword) => {
+  try {
+    if (!password || !hashedPassword || typeof password !== 'string' || typeof hashedPassword !== 'string') {
+      throw new Error('Error comparing passwords');
+    }
+    
+    const isMatch = await bcrypt.compare(password, hashedPassword);
+    return isMatch;
+  } catch (error) {
+    throw new Error('Error comparing passwords');
+  }
+};
+
 module.exports = {
   validatePasswordComplexity,
+  hashPassword,
+  comparePasswords,
   PASSWORD_CONSTRAINTS,
   commonPasswords
 };
