@@ -14,16 +14,27 @@
     "start": "cd client && npm start",
     "lint": "cd client && npm run build 2>&1 | grep -E '(error|warning)' || echo 'Lint check complete'",
     "test": "cd client && npm test",
+    "test:ci": "cd client && npm run test -- --coverage --watchAll=false",
+    "type-check": "cd client && npx tsc --noEmit",
     "clean": "rimraf client/build client/node_modules/.cache",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md}\" --ignore-path .gitignore",
     "install:all": "npm install && cd client && npm install"
   },
-  "keywords": ["faithtech", "church", "management", "saas"],
+  "keywords": [
+    "faithtech",
+    "church",
+    "management",
+    "saas"
+  ],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "devDependencies": {
     "prettier": "^2.8.7",
     "rimraf": "^4.4.1"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^5.1.0"
   }
 }
