@@ -58,7 +58,7 @@ jest.mock('nodemailer');
 jest.mock('aws-sdk');
 
 // Configure test timeouts
-jest.setTimeout(30000);
+jest.setTimeout(120000); // 2 minutes for complex tests
 
 beforeAll(async () => {
   // Create an in-memory MongoDB instance

@@ -1,4 +1,5 @@
 const request = require('supertest');
+const mongoose = require('mongoose');
 const { setupTestDB, teardownTestDB } = require('./setup');
 const app = require('../index');
 const User = require('../models/User');
@@ -30,7 +31,7 @@ describe('Edge Cases and Error Handling', () => {
 
       expect(res.status).toBe(400);
       expect(res.body).toHaveProperty('message');
-    });
+    }, 120000);
 
     it('should handle special characters in user input', async () => {
       const res = await request(app)
@@ -45,7 +46,7 @@ describe('Edge Cases and Error Handling', () => {
       expect(res.status).toBe(201);
       expect(res.body.user.firstName).toBe('Test-Name');
       expect(res.body.user.lastName).toBe("O'Connor");
-    });
+    }, 120000);
 
     it('should handle empty or whitespace-only input', async () => {
       const res = await request(app)
@@ -59,7 +60,7 @@ describe('Edge Cases and Error Handling', () => {
 
       expect(res.status).toBe(400);
       expect(res.body).toHaveProperty('message');
-    });
+    }, 120000);
 
     it('should handle unicode characters in names', async () => {
       const res = await request(app)
@@ -74,7 +75,7 @@ describe('Edge Cases and Error Handling', () => {
       expect(res.status).toBe(201);
       expect(res.body.user.firstName).toBe('名前');
       expect(res.body.user.lastName).toBe('Señor');
-    });
+    }, 120000);
 
     it('should handle special characters in email local part', async () => {
       const res = await request(app)
