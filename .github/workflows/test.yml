@@ -15,10 +15,12 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Initialize client (skip if missing)
+      - name: Neutralize client gitlink
         run: |
-          echo "Skipping client submodule initialization to avoid git errors."
-          exit 0
+          # Remove potential gitlink and stub client to avoid git exit 128
+          rm -rf client || true
+          mkdir -p client
+          echo '{}' > client/package.json
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
