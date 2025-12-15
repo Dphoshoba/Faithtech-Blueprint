@@ -22,22 +22,25 @@ jobs:
       - name: Initialize client submodule if needed
         continue-on-error: true
         run: |
+          # Completely disable error handling
           set +e
+          trap 'exit 0' ERR
           
           if [ -d "client" ] && [ -f "client/package.json" ]; then
             echo "Client directory already exists"
             exit 0
           fi
           
-          echo "Client directory not found"
+          echo "Client directory not found - attempting submodule initialization"
           
+          # Only try if .gitmodules exists
           if [ -f ".gitmodules" ]; then
-            echo "Attempting to initialize submodule..."
-            git submodule update --init --recursive 2>&1 || echo "Submodule initialization failed (this is OK)"
+            git submodule update --init --recursive 2>&1 || echo "Submodule init failed (expected)"
           else
-            echo "No .gitmodules file found - client may be a submodule without configuration"
+            echo "No .gitmodules - client is a submodule without config"
           fi
           
+          # Always succeed
           exit 0
 
       - name: Setup Node.js
@@ -82,13 +85,13 @@ jobs:
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v3
+        uses: github/codeql-action/init@v4
         with:
           languages: javascript
         continue-on-error: true
 
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v3
+        uses: github/codeql-action/analyze@v4
         continue-on-error: true
 
       - name: Upload scan results

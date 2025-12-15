@@ -18,25 +18,25 @@ jobs:
       - name: Initialize client submodule if needed
         continue-on-error: true
         run: |
-          # Always exit with 0 to prevent workflow failure
+          # Completely disable error handling
           set +e
+          trap 'exit 0' ERR
           
           if [ -d "client" ] && [ -f "client/package.json" ]; then
             echo "Client directory already exists"
             exit 0
           fi
           
-          echo "Client directory not found"
+          echo "Client directory not found - attempting submodule initialization"
           
-          # Only try submodule init if .gitmodules exists
+          # Only try if .gitmodules exists
           if [ -f ".gitmodules" ]; then
-            echo "Attempting to initialize submodule..."
-            git submodule update --init --recursive 2>&1 || echo "Submodule initialization failed (this is OK)"
+            git submodule update --init --recursive 2>&1 || echo "Submodule init failed (expected)"
           else
-            echo "No .gitmodules file found - client may be a submodule without configuration"
+            echo "No .gitmodules - client is a submodule without config"
           fi
           
-          # Always exit successfully
+          # Always succeed
           exit 0
 
       - name: Setup Node.js
