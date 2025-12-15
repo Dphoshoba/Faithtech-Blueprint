@@ -18,13 +18,20 @@ jobs:
           submodules: false
 
       - name: Neutralize gitlinks (client and service stubs)
+        continue-on-error: true
         run: |
-          rm -rf client || true
-          mkdir -p client
+          set +e
+          # Remove gitlinks from git index if they exist
+          git rm --cached client 2>/dev/null || true
+          git rm --cached services/user-service 2>/dev/null || true
+          git rm --cached services/subscription-service 2>/dev/null || true
+          # Remove directories and recreate as regular dirs
+          rm -rf client services/user-service services/subscription-service || true
+          mkdir -p client services/user-service services/subscription-service
           echo '{}' > client/package.json
-          mkdir -p services/user-service services/subscription-service
           echo '{}' > services/user-service/package.json
           echo '{}' > services/subscription-service/package.json
+          exit 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
