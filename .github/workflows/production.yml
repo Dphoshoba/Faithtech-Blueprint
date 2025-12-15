@@ -21,6 +21,10 @@ jobs:
     
     steps:
       - uses: actions/checkout@v3
+        with:
+          submodules: false
+        with:
+          submodules: false
       
       - name: Initialize client submodule if needed
         continue-on-error: true
@@ -119,6 +123,8 @@ jobs:
     
     steps:
       - uses: actions/checkout@v3
+        with:
+          submodules: false
       
       - name: Neutralize client gitlink
         run: |
@@ -162,6 +168,8 @@ jobs:
     
     steps:
       - uses: actions/checkout@v3
+        with:
+          submodules: false
       
       - name: Neutralize client gitlink
         run: |
@@ -208,6 +216,8 @@ jobs:
     
     steps:
       - uses: actions/checkout@v3
+        with:
+          submodules: false
       
       - name: Install SSH key
         uses: shimataro/ssh-key-action@v2

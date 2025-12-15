@@ -14,6 +14,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+        with:
+          submodules: false
 
       - name: Neutralize gitlinks (client and service stubs)
         run: |
