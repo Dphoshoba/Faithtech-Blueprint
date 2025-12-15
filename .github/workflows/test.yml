@@ -26,11 +26,6 @@ jobs:
         with:
           submodules: false
           fetch-depth: 1
-          sparse-checkout: |
-            /*
-            !client
-            !services/user-service
-            !services/subscription-service
 
       - name: Fix git state and create stubs (bypass all git operations)
         run: |
@@ -79,17 +74,15 @@ jobs:
           echo "Cleaning npm cache..."
           npm cache clean --force
           
-          if [ -f package-lock.json ]; then
-            echo "Attempting npm ci..."
-            if npm ci --prefer-offline --no-audit --no-fund; then
-              echo "npm ci succeeded"
-            else
+          # Check if package-lock.json exists and is valid
+          if [ -f package-lock.json ] && [ -s package-lock.json ]; then
+            echo "package-lock.json exists, attempting npm ci..."
+            npm ci --prefer-offline --no-audit --no-fund || {
               echo "npm ci failed, falling back to npm install"
-              rm -f package-lock.json
               npm install --prefer-offline --no-audit --no-fund
-            fi
+            }
           else
-            echo "No package-lock.json found, using npm install"
+            echo "No valid package-lock.json found, using npm install"
             npm install --prefer-offline --no-audit --no-fund
           fi
 
