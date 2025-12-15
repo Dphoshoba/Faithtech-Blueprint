@@ -21,11 +21,16 @@ jobs:
           echo "Git configured to ignore submodules"
 
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         continue-on-error: true
         with:
           submodules: false
           fetch-depth: 1
+          sparse-checkout: |
+            /*
+            !client
+            !services/user-service
+            !services/subscription-service
 
       - name: Fix git state and create stubs (bypass all git operations)
         run: |
