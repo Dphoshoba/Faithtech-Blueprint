@@ -13,26 +13,37 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code (skip submodules completely)
+      - name: Checkout code
         uses: actions/checkout@v3
         continue-on-error: true
         with:
           submodules: false
           fetch-depth: 1
-          sparse-checkout: |
-            *
-            !client
-            !services/user-service
-            !services/subscription-service
 
-      - name: Create stub directories (bypass gitlinks)
+      - name: Fix git state and create stubs (bypass all git operations)
         run: |
-          # Create directories without any git operations
+          # Disable git completely for this step
+          export GIT_TERMINAL_PROMPT=0
+          export GIT_ASKPASS=true
+          
+          # Remove any gitlink entries from filesystem without using git
+          rm -rf client services/user-service services/subscription-service 2>/dev/null || true
+          
+          # Create fresh directories
           mkdir -p client services/user-service services/subscription-service
-          echo '{}' > client/package.json
-          echo '{}' > services/user-service/package.json
-          echo '{}' > services/subscription-service/package.json
-          echo "Stub directories created successfully"
+          
+          # Create stub package.json files
+          cat > client/package.json << 'EOF'
+          {}
+          EOF
+          cat > services/user-service/package.json << 'EOF'
+          {}
+          EOF
+          cat > services/subscription-service/package.json << 'EOF'
+          {}
+          EOF
+          
+          echo "Stub directories created, git operations bypassed"
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
