@@ -13,35 +13,26 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code (skip submodules completely)
+        uses: actions/checkout@v3
         continue-on-error: true
         with:
           submodules: false
           fetch-depth: 1
+          sparse-checkout: |
+            *
+            !client
+            !services/user-service
+            !services/subscription-service
 
-      - name: Neutralize gitlinks (client and service stubs)
-        continue-on-error: true
+      - name: Create stub directories (bypass gitlinks)
         run: |
-          # Completely disable error handling
-          set +e
-          trap '' ERR
-          
-          # Try to remove gitlinks from git index (ignore all errors)
-          git rm --cached client 2>&1 >/dev/null || true
-          git rm --cached services/user-service 2>&1 >/dev/null || true
-          git rm --cached services/subscription-service 2>&1 >/dev/null || true
-          
-          # Remove directories and recreate as regular dirs (ignore all errors)
-          rm -rf client services/user-service services/subscription-service 2>&1 >/dev/null || true
-          mkdir -p client services/user-service services/subscription-service 2>&1 >/dev/null || true
-          
-          # Create stub package.json files
-          echo '{}' > client/package.json 2>&1 >/dev/null || true
-          echo '{}' > services/user-service/package.json 2>&1 >/dev/null || true
-          echo '{}' > services/subscription-service/package.json 2>&1 >/dev/null || true
-          
-          # Always succeed
-          exit 0
+          # Create directories without any git operations
+          mkdir -p client services/user-service services/subscription-service
+          echo '{}' > client/package.json
+          echo '{}' > services/user-service/package.json
+          echo '{}' > services/subscription-service/package.json
+          echo "Stub directories created successfully"
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
