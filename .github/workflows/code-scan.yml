@@ -14,9 +14,19 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-        with:
-          submodules: recursive
-          fetch-depth: 0
+
+      - name: Initialize client submodule if needed
+        continue-on-error: true
+        run: |
+          if [ ! -d "client" ] || [ ! -f "client/package.json" ]; then
+            echo "Client directory not found, attempting to initialize submodule..."
+            git submodule update --init --recursive || echo "Submodule initialization failed, will try alternative approach..."
+            # If submodule init fails, try to checkout the client from the main repo
+            if [ ! -d "client" ] || [ ! -f "client/package.json" ]; then
+              echo "Attempting to checkout client from main repository..."
+              git checkout HEAD -- client 2>/dev/null || echo "Could not checkout client, some tests may fail"
+            fi
+          fi
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
