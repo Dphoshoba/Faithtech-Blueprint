@@ -18,24 +18,28 @@ jobs:
       - name: Initialize client submodule if needed
         continue-on-error: true
         run: |
+          set +e  # Don't exit on error
           if [ ! -d "client" ] || [ ! -f "client/package.json" ]; then
             echo "Client directory not found, attempting to initialize submodule..."
             if [ -f ".gitmodules" ]; then
-              git submodule update --init --recursive || echo "Submodule initialization failed"
+              git submodule update --init --recursive 2>&1 || echo "Submodule initialization failed"
             else
               echo "No .gitmodules file found, client may be tracked as submodule without configuration"
             fi
             # If client still doesn't exist, try to get it from the repository
             if [ ! -d "client" ] || [ ! -f "client/package.json" ]; then
               echo "Attempting alternative approach to get client directory..."
-              CLIENT_COMMIT=$(git ls-tree HEAD client | awk '{print $3}')
-              if [ -n "$CLIENT_COMMIT" ]; then
+              CLIENT_COMMIT=$(git ls-tree HEAD client 2>/dev/null | awk '{print $3}' || echo "")
+              if [ -n "$CLIENT_COMMIT" ] && [ "$CLIENT_COMMIT" != "160000" ]; then
                 echo "Found client commit: $CLIENT_COMMIT"
                 # Try to checkout the client directory contents
                 git read-tree --prefix=client/ -u $CLIENT_COMMIT 2>/dev/null || echo "Could not read client tree"
+              else
+                echo "Client appears to be a submodule (mode 160000), skipping alternative checkout"
               fi
             fi
           fi
+          set -e  # Re-enable exit on error
           # Verify client directory exists
           if [ -d "client" ] && [ -f "client/package.json" ]; then
             echo "Client directory is available"
