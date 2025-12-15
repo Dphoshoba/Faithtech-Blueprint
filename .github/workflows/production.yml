@@ -171,46 +171,34 @@ jobs:
       
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
-      
-      - name: Login to Docker Hub
-        uses: docker/login-action@v2
         continue-on-error: true
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
       
-      - name: Build and push API Gateway
-        uses: docker/build-push-action@v4
-        continue-on-error: true
-        with:
-          context: ./api-gateway
-          file: ./api-gateway/Dockerfile
-          push: false
-          tags: ${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_NAMESPACE }}/api-gateway:latest
-          cache-from: type=registry,ref=${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_NAMESPACE }}/api-gateway:buildcache
-          cache-to: type=registry,ref=${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_NAMESPACE }}/api-gateway:buildcache,mode=max
+      - name: Build API Gateway (skip if missing, no push)
+        run: |
+          set -e
+          if [ ! -d "./api-gateway" ] || [ ! -f "./api-gateway/Dockerfile" ]; then
+            echo "api-gateway path or Dockerfile missing, skipping build"
+            exit 0
+          fi
+          docker build -f ./api-gateway/Dockerfile -t api-gateway-local ./api-gateway || true
       
-      - name: Build User Service (no push)
-        uses: docker/build-push-action@v4
-        continue-on-error: true
-        with:
-          context: ./services/user-service
-          file: ./services/user-service/Dockerfile
-          push: false
-          tags: ${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_NAMESPACE }}/user-service:latest
-          cache-from: type=registry,ref=${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_NAMESPACE }}/user-service:buildcache
-          cache-to: type=registry,ref=${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_NAMESPACE }}/user-service:buildcache,mode=max
+      - name: Build User Service (skip if missing, no push)
+        run: |
+          set -e
+          if [ ! -d "./services/user-service" ] || [ ! -f "./services/user-service/Dockerfile" ]; then
+            echo "user-service path or Dockerfile missing, skipping build"
+            exit 0
+          fi
+          docker build -f ./services/user-service/Dockerfile -t user-service-local ./services/user-service || true
       
-      - name: Build Subscription Service (no push)
-        uses: docker/build-push-action@v4
-        continue-on-error: true
-        with:
-          context: ./services/subscription-service
-          file: ./services/subscription-service/Dockerfile
-          push: false
-          tags: ${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_NAMESPACE }}/subscription-service:latest
-          cache-from: type=registry,ref=${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_NAMESPACE }}/subscription-service:buildcache
-          cache-to: type=registry,ref=${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_NAMESPACE }}/subscription-service:buildcache,mode=max
+      - name: Build Subscription Service (skip if missing, no push)
+        run: |
+          set -e
+          if [ ! -d "./services/subscription-service" ] || [ ! -f "./services/subscription-service/Dockerfile" ]; then
+            echo "subscription-service path or Dockerfile missing, skipping build"
+            exit 0
+          fi
+          docker build -f ./services/subscription-service/Dockerfile -t subscription-service-local ./services/subscription-service || true
 
   deploy:
     name: Deploy

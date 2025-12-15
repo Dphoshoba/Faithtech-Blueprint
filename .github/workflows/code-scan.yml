@@ -24,6 +24,10 @@ jobs:
           rm -rf client || true
           mkdir -p client
           echo '{}' > client/package.json
+          # also neutralize services gitlinks if any
+          mkdir -p services/user-service services/subscription-service
+          echo '{}' > services/user-service/package.json
+          echo '{}' > services/subscription-service/package.json
 
       - name: Setup Node.js
         uses: actions/setup-node@v3

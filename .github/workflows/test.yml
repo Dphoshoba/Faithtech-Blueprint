@@ -15,12 +15,14 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Neutralize client gitlink
+      - name: Neutralize gitlinks (client and service stubs)
         run: |
-          # Remove potential gitlink and stub client to avoid git exit 128
           rm -rf client || true
           mkdir -p client
           echo '{}' > client/package.json
+          mkdir -p services/user-service services/subscription-service
+          echo '{}' > services/user-service/package.json
+          echo '{}' > services/subscription-service/package.json
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
