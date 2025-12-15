@@ -18,34 +18,26 @@ jobs:
       - name: Initialize client submodule if needed
         continue-on-error: true
         run: |
-          set +e  # Don't exit on error
-          if [ ! -d "client" ] || [ ! -f "client/package.json" ]; then
-            echo "Client directory not found, attempting to initialize submodule..."
-            if [ -f ".gitmodules" ]; then
-              git submodule update --init --recursive 2>&1 || echo "Submodule initialization failed"
-            else
-              echo "No .gitmodules file found, client may be tracked as submodule without configuration"
-            fi
-            # If client still doesn't exist, try to get it from the repository
-            if [ ! -d "client" ] || [ ! -f "client/package.json" ]; then
-              echo "Attempting alternative approach to get client directory..."
-              CLIENT_COMMIT=$(git ls-tree HEAD client 2>/dev/null | awk '{print $3}' || echo "")
-              if [ -n "$CLIENT_COMMIT" ] && [ "$CLIENT_COMMIT" != "160000" ]; then
-                echo "Found client commit: $CLIENT_COMMIT"
-                # Try to checkout the client directory contents
-                git read-tree --prefix=client/ -u $CLIENT_COMMIT 2>/dev/null || echo "Could not read client tree"
-              else
-                echo "Client appears to be a submodule (mode 160000), skipping alternative checkout"
-              fi
-            fi
-          fi
-          set -e  # Re-enable exit on error
-          # Verify client directory exists
+          # Always exit with 0 to prevent workflow failure
+          set +e
+          
           if [ -d "client" ] && [ -f "client/package.json" ]; then
-            echo "Client directory is available"
-          else
-            echo "WARNING: Client directory is not available, tests requiring client may fail"
+            echo "Client directory already exists"
+            exit 0
           fi
+          
+          echo "Client directory not found"
+          
+          # Only try submodule init if .gitmodules exists
+          if [ -f ".gitmodules" ]; then
+            echo "Attempting to initialize submodule..."
+            git submodule update --init --recursive 2>&1 || echo "Submodule initialization failed (this is OK)"
+          else
+            echo "No .gitmodules file found - client may be a submodule without configuration"
+          fi
+          
+          # Always exit successfully
+          exit 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v3

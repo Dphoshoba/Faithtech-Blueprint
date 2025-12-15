@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [ main ]
 
+permissions:
+  contents: read
+  security-events: write
+
 env:
   DOCKER_REGISTRY: docker.io
   DOCKER_NAMESPACE: faithtech
@@ -119,27 +123,34 @@ jobs:
       - name: Initialize client submodule if needed
         continue-on-error: true
         run: |
-          set +e  # Don't exit on error
+          # Disable exit on error for this entire step
+          set +e
+          EXIT_CODE=0
+          
           if [ ! -d "client" ] || [ ! -f "client/package.json" ]; then
             echo "Client directory not found, attempting to initialize submodule..."
+            
+            # Try submodule initialization only if .gitmodules exists
             if [ -f ".gitmodules" ]; then
-              git submodule update --init --recursive 2>&1 || echo "Submodule initialization failed"
+              git submodule update --init --recursive 2>&1 || {
+                echo "Submodule initialization failed"
+                EXIT_CODE=1
+              }
             else
               echo "No .gitmodules file found, client may be tracked as submodule without configuration"
             fi
-            # If client still doesn't exist, try to get it from the repository
+            
+            # If client still doesn't exist, skip alternative approaches for submodules
             if [ ! -d "client" ] || [ ! -f "client/package.json" ]; then
-              echo "Attempting alternative approach to get client directory..."
-              CLIENT_COMMIT=$(git ls-tree HEAD client 2>/dev/null | awk '{print $3}' || echo "")
-              if [ -n "$CLIENT_COMMIT" ] && [ "$CLIENT_COMMIT" != "160000" ]; then
-                echo "Found client commit: $CLIENT_COMMIT"
-                git read-tree --prefix=client/ -u $CLIENT_COMMIT 2>/dev/null || echo "Could not read client tree"
-              else
-                echo "Client appears to be a submodule (mode 160000), skipping alternative checkout"
-              fi
+              echo "Client directory still not available after submodule initialization"
+              echo "This is expected if client is a submodule without proper configuration"
             fi
+          else
+            echo "Client directory already exists"
           fi
-          set -e  # Re-enable exit on error
+          
+          # Always exit with 0 to prevent workflow failure
+          exit 0
       
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
@@ -177,6 +188,17 @@ jobs:
     
     steps:
       - uses: actions/checkout@v3
+      
+      - name: Initialize client submodule if needed
+        continue-on-error: true
+        run: |
+          set +e
+          if [ ! -d "client" ] || [ ! -f "client/package.json" ]; then
+            if [ -f ".gitmodules" ]; then
+              git submodule update --init --recursive 2>&1 || echo "Submodule init failed (OK)"
+            fi
+          fi
+          exit 0
       
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
