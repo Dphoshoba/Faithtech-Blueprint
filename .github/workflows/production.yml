@@ -108,6 +108,10 @@ jobs:
     name: Security Scan
     runs-on: ubuntu-latest
     needs: test
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
     
     steps:
       - uses: actions/checkout@v3
@@ -115,6 +119,7 @@ jobs:
       - name: Initialize client submodule if needed
         continue-on-error: true
         run: |
+          set +e  # Don't exit on error
           if [ ! -d "client" ] || [ ! -f "client/package.json" ]; then
             echo "Client directory not found, attempting to initialize submodule..."
             if [ -f ".gitmodules" ]; then
@@ -126,21 +131,24 @@ jobs:
             if [ ! -d "client" ] || [ ! -f "client/package.json" ]; then
               echo "Attempting alternative approach to get client directory..."
               CLIENT_COMMIT=$(git ls-tree HEAD client 2>/dev/null | awk '{print $3}' || echo "")
-              if [ -n "$CLIENT_COMMIT" ]; then
+              if [ -n "$CLIENT_COMMIT" ] && [ "$CLIENT_COMMIT" != "160000" ]; then
                 echo "Found client commit: $CLIENT_COMMIT"
                 git read-tree --prefix=client/ -u $CLIENT_COMMIT 2>/dev/null || echo "Could not read client tree"
+              else
+                echo "Client appears to be a submodule (mode 160000), skipping alternative checkout"
               fi
             fi
           fi
+          set -e  # Re-enable exit on error
       
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v2
+        uses: github/codeql-action/init@v3
         with:
           languages: javascript
         continue-on-error: true
       
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v2
+        uses: github/codeql-action/analyze@v3
         continue-on-error: true
       
       - name: Run dependency scan
@@ -175,6 +183,7 @@ jobs:
       
       - name: Login to Docker Hub
         uses: docker/login-action@v2
+        continue-on-error: true
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
