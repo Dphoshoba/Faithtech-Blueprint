@@ -45,5 +45,7 @@ const restrictTo = (...roles) => {
 
 module.exports = {
   protect,
-  restrictTo
+  restrictTo,
+  // Alias used by some route files (e.g. templateRoutes.js)
+  auth: protect
 }; 

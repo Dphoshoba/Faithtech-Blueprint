@@ -47,38 +47,67 @@ app.get('/health', (req, res) => {
 app.use(errorHandler);
 
 // Connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/faithtech-assessment', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-})
-.then(async () => {
-  console.log('Connected to MongoDB');
-  
-  // Load sample data in development
-  if (process.env.NODE_ENV === 'development') {
-    try {
-      const count = await Assessment.countDocuments();
-      if (count === 0) {
-        await Assessment.insertMany(sampleAssessments.map(assessment => ({
-          ...assessment,
-          createdBy: '000000000000000000000000', // Placeholder ID
-          organization: '000000000000000000000000' // Placeholder ID
-        })));
-        console.log('Sample assessments loaded');
-      }
-    } catch (error) {
-      console.error('Error loading sample data:', error);
-    }
+const connectDB = async () => {
+  // Skip database connection in test environment as it's handled by the test setup
+  if (process.env.NODE_ENV === 'test') {
+    return;
   }
-})
-.catch(err => {
-  console.error('MongoDB connection error:', err);
-  process.exit(1);
-});
+
+  try {
+    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/faithtech-assessment', {
+      useNewUrlParser: true,
+      useUnifiedTopology: true
+    });
+    console.log('Connected to MongoDB');
+
+    // Load sample data in development
+    if (process.env.NODE_ENV === 'development') {
+      try {
+        const count = await Assessment.countDocuments();
+        if (count === 0) {
+          await Assessment.insertMany(sampleAssessments.map(assessment => ({
+            ...assessment,
+            createdBy: '000000000000000000000000', // Placeholder ID
+            organization: '000000000000000000000000' // Placeholder ID
+          })));
+          console.log('Sample assessments loaded');
+        }
+      } catch (error) {
+        console.error('Error loading sample data:', error);
+      }
+    }
+  } catch (err) {
+    console.error('MongoDB connection error:', err);
+    process.exit(1);
+  }
+};
 
 // Start server
 const PORT = process.env.PORT || 3002;
-app.listen(PORT, () => {
-  console.log(`Assessment service running on port ${PORT}`);
-  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
-}); 
+let server;
+
+const startServer = async () => {
+  await connectDB();
+  server = app.listen(PORT, () => {
+    console.log(`Assessment service running on port ${PORT}`);
+    console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  });
+
+  server.on('error', (error) => {
+    if (error.code === 'EADDRINUSE') {
+      console.error(`Port ${PORT} is in use, trying ${PORT + 1}`);
+      server.close();
+      app.listen(PORT + 1);
+    } else {
+      console.error('Server error:', error);
+      process.exit(1);
+    }
+  });
+};
+
+// Only start the server if we're not in a test environment
+if (process.env.NODE_ENV !== 'test') {
+  startServer();
+}
+
+module.exports = app; 
