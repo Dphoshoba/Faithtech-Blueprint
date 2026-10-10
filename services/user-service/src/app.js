@@ -9,7 +9,7 @@ const csrf = require('csurf');
 const cookieParser = require('cookie-parser');
 
 // Import routes
-const authRoutes = require('./routes/authRoutes');
+const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/userRoutes');
 const plansRouter = require('./routes/plans');
 const subscriptionsRouter = require('./routes/subscriptions');

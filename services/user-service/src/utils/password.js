@@ -94,7 +94,7 @@ const validatePasswordComplexity = (password, username = '') => {
   };
 };
 
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 
 /**
  * Hash a password using bcrypt

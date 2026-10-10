@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { format } from 'date-fns';
-import logger from '../utils/logger';
-import { createProviderRateLimiter } from '../utils/rateLimiter';
+import logger from '../../utils/logger';
+import { createProviderRateLimiter } from '../../utils/rateLimiter';
 import { Person, Group, Donation, PaginatedResponse, SyncResult } from '../../types/integration';
 
 interface TithelyAuth {

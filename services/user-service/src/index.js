@@ -21,8 +21,7 @@ const {
 } = require('./middleware/security.middleware');
 
 // Import routes
-const authRoutes = require('./routes/authRoutes');
-const simpleAuthRoutes = require('./routes/simple-auth');
+const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/userRoutes');
 const plansRouter = require('./routes/plans');
 const subscriptionsRouter = require('./routes/subscriptions');
@@ -52,7 +51,6 @@ app.use('/api', apiLimiter);
 
 // API routes
 app.use('/api/auth', authRoutes);
-app.use('/api/simple-auth', simpleAuthRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/plans', plansRouter);
 app.use('/api/subscriptions', subscriptionsRouter);
