@@ -8,7 +8,7 @@ FaithTech Blueprint is a **microservices-based SaaS platform** for church manage
 
 ```
 faithtech-blueprint/
-├── client/                    # React Frontend (Create React App)
+├── client/                    # React/TypeScript Frontend (Vite + MUI + React Router)
 ├── services/                  # Backend Microservices
 │   ├── user-service/         # User management & authentication
 │   ├── assessment-service/   # Assessments & evaluations
@@ -60,11 +60,11 @@ npm install
 npm run dev
 ```
 
-**Terminal 4 - API Gateway (Port 8000):**
+**Terminal 4 - API Gateway (Port 3000):**
 ```bash
-cd api-gateway
+cd services/api-gateway
 npm install
-npm start
+npm run dev
 ```
 
 #### **2. Start the Frontend Client**
@@ -73,7 +73,7 @@ npm start
 ```bash
 cd client
 npm install
-PORT=3001 npm start
+PORT=3001 npm run dev
 ```
 
 The client will automatically open at `http://localhost:3001`
@@ -290,7 +290,7 @@ npm run clean
 cd client
 
 # Start development server
-npm start
+npm run dev
 
 # Build for production
 npm run build
@@ -310,7 +310,7 @@ cd services/user-service
 npm run dev
 
 # Start in production mode
-npm start
+npm run dev
 
 # Run tests
 npm test
