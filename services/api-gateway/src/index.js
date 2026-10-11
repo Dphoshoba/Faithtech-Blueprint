@@ -36,14 +36,11 @@ const services = {
   template: process.env.TEMPLATE_SERVICE_URL || 'http://localhost:3003'
 };
 
-// Proxy options
+// Proxy options — keep the full /api/* path so downstream services
+// (which mount their routers at /api/auth, /api/assessments, etc.)
+// receive the same path they expect.
 const proxyOptions = {
   changeOrigin: true,
-  pathRewrite: {
-    '^/api/auth': '/',
-    '^/api/assessments': '/',
-    '^/api/templates': '/'
-  },
   onProxyReq: (proxyReq, req) => {
     // Forward user info from verified token
     if (req.user) {

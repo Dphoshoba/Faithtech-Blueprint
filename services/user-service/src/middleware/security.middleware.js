@@ -54,13 +54,23 @@ exports.securityHeaders = helmet({
 });
 
 // CORS configuration
-exports.corsOptions = cors({
+exports.corsOptions = {
   origin: process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : ['http://localhost:3000'],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
   exposedHeaders: ['X-Total-Count', 'X-Rate-Limit'],
   credentials: true,
   maxAge: 86400 // 24 hours
+};
+
+// CORS middleware (pre-built from the options above)
+exports.corsMiddleware = cors({
+  origin: process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : ['http://localhost:3000'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  exposedHeaders: ['X-Total-Count', 'X-Rate-Limit'],
+  credentials: true,
+  maxAge: 86400
 });
 
 // Request sanitization middleware
