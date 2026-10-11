@@ -1,3 +1,25 @@
+# Dependencies
 node_modules
-node_modules/
-.cache/
+**/node_modules
+
+# Build artifacts
+dist
+build
+*.tsbuildinfo
+tsconfig.tsbuildinfo
+
+# Logs
+*.log
+logs/
+
+# Environment
+.env
+.env.local
+.env.production
+
+# Coverage
+coverage
+**/coverage
+
+# OS
+.DS_Store
