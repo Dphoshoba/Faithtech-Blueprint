@@ -8,6 +8,7 @@ const {
   getAssessment,
   updateAssessment,
   deleteAssessment,
+  getResponse,
   submitResponse
 } = require('../controllers/assessmentController');
 
@@ -26,5 +27,6 @@ router.route('/:id')
 
 // Response routes
 router.post('/:id/submit', submitResponse);
+router.get('/results/:responseId', getResponse);
 
 module.exports = router; 

@@ -27,21 +27,27 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { api } from '../../lib/api';
 import { useToast } from '../../components/ui/Toast';
 
+interface QuestionOption {
+  text: string;
+  value: number;
+  weight?: number;
+}
+
 interface Question {
   _id: string;
-  id?: string;
   text: string;
-  type: 'text' | 'multiple_choice' | 'scale' | 'boolean' | 'rating';
-  options?: string[];
+  type: 'multiple-choice' | 'likert' | 'open-ended' | 'boolean';
+  options?: QuestionOption[];
+  category?: string;
   required?: boolean;
 }
 
 interface Assessment {
   _id: string;
-  id?: string;
   title: string;
   description: string;
   questions: Question[];
+  metadata?: { estimatedTime?: number };
 }
 
 export default function AssessmentTakePage() {
@@ -50,7 +56,7 @@ export default function AssessmentTakePage() {
   const { pushToast } = useToast();
 
   const [assessment, setAssessment] = useState<Assessment | null>(null);
-  const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [answers, setAnswers] = useState<Record<string, number | string>>({});
   const [activeStep, setActiveStep] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -60,7 +66,7 @@ export default function AssessmentTakePage() {
     let mounted = true;
     const load = async () => {
       try {
-        const { data } = await api.get<Assessment>(`/assessments/${id}`);
+        const res = await api.get<Assessment>(`/assessments/${id}`); const data = res as unknown as Assessment;
         if (mounted) {
           setAssessment(data);
           setError(null);
@@ -78,7 +84,7 @@ export default function AssessmentTakePage() {
     return () => { mounted = false; };
   }, [id, pushToast]);
 
-  const handleAnswer = (questionId: string, value: string) => {
+  const handleAnswer = (questionId: string, value: number | string) => {
     setAnswers((prev) => ({ ...prev, [questionId]: value }));
   };
 
@@ -95,18 +101,19 @@ export default function AssessmentTakePage() {
     setSubmitting(true);
     try {
       const payload = {
-        assessmentId: assessment._id,
-        answers: Object.entries(answers).map(([questionId, answer]) => ({
+        answers: Object.entries(answers).map(([questionId, value]) => ({
           questionId,
-          answer,
+          value,
         })),
       };
-      const { data } = await api.post<{ responseId: string }>(
+      const data = await api.post<{ _id: string; responseId?: string }>(
         `/assessments/${assessment._id}/submit`,
         payload
       );
+      const responseId = (data as { _id?: string; responseId?: string })._id
+        || (data as { _id?: string; responseId?: string }).responseId;
       pushToast({ variant: 'success', title: 'Assessment submitted', message: 'Great work!' });
-      navigate(`/assessments/results/${data.responseId}`);
+      navigate(`/assessments/results/${responseId}`);
     } catch (err) {
       pushToast({ variant: 'error', title: 'Submission failed', message: (err as Error).message });
     } finally {
@@ -165,26 +172,30 @@ export default function AssessmentTakePage() {
               {activeStep + 1}. {current.text}
             </Typography>
 
-            {current.type === 'text' || current.type === 'rating' ? (
+            {current.type === 'open-ended' ? (
               <TextField
                 fullWidth
                 multiline
                 rows={3}
-                value={answers[current._id] || ''}
+                value={(answers[current._id] as string) || ''}
                 onChange={(e) => handleAnswer(current._id, e.target.value)}
-                placeholder={
-                  current.type === 'rating'
-                    ? 'Enter a number 1-10'
-                    : 'Type your answer…'
-                }
+                placeholder="Type your answer…"
               />
-            ) : (
+            ) : current.type === 'boolean' ? (
               <RadioGroup
-                value={answers[current._id] || ''}
+                value={(answers[current._id] as string) ?? ''}
                 onChange={(e) => handleAnswer(current._id, e.target.value)}
               >
-                {current.options?.map((opt, i) => (
-                  <FormControlLabel key={i} value={opt} control={<Radio />} label={opt} />
+                <FormControlLabel value="true" control={<Radio />} label="Yes" />
+                <FormControlLabel value="false" control={<Radio />} label="No" />
+              </RadioGroup>
+            ) : (
+              <RadioGroup
+                value={(answers[current._id] as number) ?? ''}
+                onChange={(e) => handleAnswer(current._id, Number(e.target.value))}
+              >
+                {(current.options || []).map((opt, i) => (
+                  <FormControlLabel key={i} value={opt.value} control={<Radio />} label={opt.text} />
                 ))}
               </RadioGroup>
             )}

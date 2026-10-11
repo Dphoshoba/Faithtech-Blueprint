@@ -48,7 +48,12 @@ class ApiClient {
     );
 
     this.client.interceptors.response.use(
-      (response) => response,
+      (response) => {
+        (response as { data: unknown }).data = this.normalize(
+          (response as { data: unknown }).data
+        );
+        return response;
+      },
       async (error: AxiosError) => {
         const originalRequest = error.config as InternalAxiosRequestConfig & {
           _retry?: boolean;
@@ -148,6 +153,34 @@ class ApiClient {
     } catch {
       return null;
     }
+  }
+
+  /**
+   * Normalize backend response envelopes so callers can always read
+   * `.data` regardless of whether the service wraps its payload in
+   * `{ status, data }`, `{ data }`, `{ user }`, `{ users }`, or returns
+   * a bare array/object.
+   */
+  private normalize(payload: unknown): unknown {
+    if (payload === null || payload === undefined) return payload;
+
+    // Bare arrays (e.g. assessment list) — pass through.
+    if (Array.isArray(payload)) return payload;
+
+    if (typeof payload !== 'object') return payload;
+    const obj = payload as Record<string, unknown>;
+
+    // { data: [...] } or { data: {...} } — unwrap.
+    if ('data' in obj) return obj.data;
+
+    // { users: [...] } or { user: {...} } — unwrap.
+    if ('users' in obj) return obj.users;
+    if ('user' in obj) return obj.user;
+
+    // { results: [...] } — unwrap.
+    if ('results' in obj && Array.isArray(obj.results)) return obj.results;
+
+    return payload;
   }
 
   // ── Public API ─────────────────────────────────────────────────

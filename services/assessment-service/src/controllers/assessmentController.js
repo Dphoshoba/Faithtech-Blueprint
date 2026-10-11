@@ -171,6 +171,67 @@ exports.deleteAssessment = async (req, res) => {
   }
 };
 
+// Get assessment response results (by response id)
+exports.getResponse = async (req, res) => {
+  try {
+    const response = await AssessmentResponse.findById(req.params.responseId)
+      .populate('assessment')
+      .populate('respondent', 'firstName lastName email');
+
+    if (!response) {
+      return res.status(404).json({
+        status: 'error',
+        message: 'Response not found'
+      });
+    }
+
+    // Shape the response for the frontend results page
+    const categoryScores = (response.categoryScores || []).map((cat) => ({
+      name: cat.name,
+      score: cat.score,
+      maxPossible: cat.maxPossible,
+      percentage: cat.percentage,
+      recommendations: (cat.recommendations || []).map((r) => ({
+        text: r.text,
+        priority: r.priority,
+        actionItems: r.actionItems,
+        resources: r.resources
+      }))
+    }));
+
+    const flatRecommendations = categoryScores.flatMap((cat) =>
+      (cat.recommendations || []).map((r) => ({
+        title: r.text,
+        description: (r.actionItems || []).join('. '),
+        priority: r.priority,
+        category: cat.name
+      }))
+    );
+
+    res.json({
+      status: 'success',
+      data: {
+        responseId: response._id,
+        assessment: {
+          _id: response.assessment._id,
+          title: response.assessment.title,
+          description: response.assessment.description
+        },
+        overallScore: response.overallScore,
+        categoryScores,
+        recommendations: flatRecommendations,
+        completedAt: response.completedAt,
+        status: response.status
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 'error',
+      message: error.message
+    });
+  }
+};
+
 // Submit assessment response
 exports.submitResponse = async (req, res) => {
   try {
