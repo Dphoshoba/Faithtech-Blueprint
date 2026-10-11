@@ -82,7 +82,7 @@ export default function AssessmentBuilderPage() {
         await api.put(`/assessments/${id}`, payload);
         pushToast({ variant: 'success', title: 'Assessment updated', message: 'Your changes have been saved.' });
       } else {
-        const { data } = await api.post<{ _id: string }>('/assessments', payload);
+        const data = await api.post<{ _id: string }>('/assessments', payload);
         pushToast({ variant: 'success', title: 'Assessment created', message: 'Your assessment has been saved.' });
         navigate(`/assessments/build/${data._id}`);
       }

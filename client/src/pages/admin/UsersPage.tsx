@@ -39,7 +39,7 @@ export default function AdminUsersPage() {
     let mounted = true;
     const load = async () => {
       try {
-        const { data } = await api.get<User[]>('/users');
+        const data = await api.get<User[]>('/users');
         if (mounted) setUsers(data);
       } catch (err) {
         if (mounted) {

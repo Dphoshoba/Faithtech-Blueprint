@@ -88,8 +88,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       try {
-        const { data } = await api.get<{ data: { user: Record<string, unknown> } }>('/users/me');
-        if (mounted) setUser(normalizeUser(data.data.user));
+        const data = (await api.get<Record<string, unknown>>( '/users/me' )) as Record<string, unknown>;
+        if (mounted) setUser(normalizeUser(data.user as Record<string, unknown>));
       } catch {
         // Token invalid/expired — clear and let the interceptor redirect
         api.clearAuth();
@@ -116,20 +116,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = async (email: string, password: string) => {
     setError(null);
     try {
-      const { data } = await api.post<{
+      const data = await api.post<{
         success: boolean;
-        data: { user: Record<string, unknown>; token: string };
+        user: Record<string, unknown>;
+        token: string;
       }>('/auth/login', { email, password });
 
-      if (!data.success || !data.data) {
+      if (!data.success || !data.token) {
         throw new Error('Login failed');
       }
 
       api.setAuthTokens({
-        accessToken: data.data.token,
+        accessToken: data.token,
         expiresIn: 24 * 60 * 60,
       });
-      setUser(normalizeUser(data.data.user));
+      setUser(normalizeUser(data.user as Record<string, unknown>));
     } catch (err) {
       const message =
         (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
@@ -143,20 +144,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const register = async (payload: RegisterData) => {
     setError(null);
     try {
-      const { data } = await api.post<{
+      const data = await api.post<{
         success: boolean;
-        data: { user: Record<string, unknown>; token: string };
+        user: Record<string, unknown>;
+        token: string;
       }>('/auth/register', payload);
 
-      if (!data.success || !data.data) {
+      if (!data.success || !data.token) {
         throw new Error('Registration failed');
       }
 
       api.setAuthTokens({
-        accessToken: data.data.token,
+        accessToken: data.token,
         expiresIn: 24 * 60 * 60,
       });
-      setUser(normalizeUser(data.data.user));
+      setUser(normalizeUser(data.user as Record<string, unknown>));
     } catch (err) {
       const message =
         (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
@@ -179,8 +181,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const refreshUser = async () => {
     try {
-      const { data } = await api.get<{ data: { user: Record<string, unknown> } }>('/users/me');
-      setUser(normalizeUser(data.data.user));
+      const data = (await api.get<Record<string, unknown>>( '/users/me' )) as Record<string, unknown>;
+      setUser(normalizeUser(data.user as Record<string, unknown>));
     } catch {
       api.clearAuth();
       setUser(null);

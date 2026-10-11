@@ -41,7 +41,7 @@ export default function AdminLeadsPage() {
     let mounted = true;
     const load = async () => {
       try {
-        const { data } = await api.get<Lead[]>('/admin/leads');
+        const data = await api.get<Lead[]>('/admin/leads');
         if (mounted) setLeads(data);
       } catch (err) {
         if (mounted) {

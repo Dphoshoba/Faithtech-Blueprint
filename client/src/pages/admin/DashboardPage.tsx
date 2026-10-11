@@ -43,7 +43,7 @@ export default function DashboardPage() {
     let mounted = true;
     const load = async () => {
       try {
-        const { data } = await api.get<DashboardStats>('/users/me');
+        const data = await api.get<DashboardStats>('/users/me');
         // The above returns user profile; for stats we'd call an analytics endpoint.
         // Fallback to a safe empty shape so the UI renders.
         if (mounted) {

@@ -186,23 +186,28 @@ class ApiClient {
   // ── Public API ─────────────────────────────────────────────────
 
   get<T>(url: string, params?: Record<string, unknown>) {
-    return this.client.get<T>(url, { params });
+    return this.client.get<T>(url, { params }).then((res) => res.data as T);
   }
 
   post<T>(url: string, data?: unknown) {
-    return this.client.post<T>(url, data);
+    return this.client.post<T>(url, data).then((res) => res.data as T);
   }
 
   put<T>(url: string, data?: unknown) {
-    return this.client.put<T>(url, data);
+    return this.client.put<T>(url, data).then((res) => res.data as T);
   }
 
   patch<T>(url: string, data?: unknown) {
-    return this.client.patch<T>(url, data);
+    return this.client.patch<T>(url, data).then((res) => res.data as T);
   }
 
   delete<T>(url: string) {
-    return this.client.delete<T>(url);
+    return this.client.delete<T>(url).then((res) => res.data as T);
+  }
+
+  /** Untyped variant that returns the raw (normalized) payload. */
+  getRaw(url: string, params?: Record<string, unknown>) {
+    return this.client.get<unknown>(url, { params }).then((res) => res.data);
   }
 
   /** Set tokens after login/register. */

@@ -45,7 +45,7 @@ export default function AssessmentListPage() {
     let mounted = true;
     const load = async () => {
       try {
-        const { data } = await api.get<Assessment[]>('/assessments');
+        const data = await api.get<Assessment[]>('/assessments');
         if (mounted) {
           setAssessments(data);
           setFiltered(data);

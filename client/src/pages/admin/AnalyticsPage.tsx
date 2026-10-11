@@ -38,7 +38,7 @@ export default function AdminAnalyticsPage() {
     let mounted = true;
     const load = async () => {
       try {
-        const { data } = await api.get<Analytics>('/users/me');
+        const data = await api.get<Analytics>('/users/me');
         if (mounted) {
           setAnalytics({
             users: { total: 0, active: 0, newThisWeek: 0 },

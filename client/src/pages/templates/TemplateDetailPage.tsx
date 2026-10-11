@@ -47,7 +47,7 @@ export default function TemplateDetailPage() {
     let mounted = true;
     const load = async () => {
       try {
-        const { data } = await api.get<Template[]>('/templates');
+        const data = await api.get<Template[]>('/templates');
         if (mounted) {
           setTemplates(data);
           setFiltered(data);

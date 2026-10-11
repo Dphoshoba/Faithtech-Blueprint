@@ -43,7 +43,7 @@ export default function AdminAssessmentsPage() {
     let mounted = true;
     const load = async () => {
       try {
-        const { data } = await api.get<Assessment[]>('/assessments');
+        const data = await api.get<Assessment[]>('/assessments');
         if (mounted) setAssessments(data);
       } catch (err) {
         if (mounted) {

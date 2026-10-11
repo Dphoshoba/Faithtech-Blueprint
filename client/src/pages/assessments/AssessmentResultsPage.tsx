@@ -51,7 +51,7 @@ export default function AssessmentResultsPage() {
     let mounted = true;
     const load = async () => {
       try {
-        const { data } = await api.get<Results>(`/assessments/results/${responseId}`);
+        const data = await api.get<Results>(`/assessments/results/${responseId}`);
         if (mounted) setResults(data);
       } catch (err) {
         if (mounted) {
