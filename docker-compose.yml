@@ -11,29 +11,31 @@ services:
     environment:
       - NODE_ENV=development
       - PORT=3000
-      - AUTH_SERVICE_URL=http://auth-service:3001
+      - AUTH_SERVICE_URL=http://user-service:3005
       - ASSESSMENT_SERVICE_URL=http://assessment-service:3002
-      - TEMPLATE_SERVICE_URL=http://template-service:3003
+      - TEMPLATE_SERVICE_URL=http://template-service:3006
       - JWT_SECRET=${JWT_SECRET}
-      - ALLOWED_ORIGINS=http://localhost:3000
+      - ALLOWED_ORIGINS=http://localhost:3001
     depends_on:
-      - auth-service
+      - user-service
       - assessment-service
       - template-service
 
-  # Auth Service
-  auth-service:
+  # User/Auth Service (the canonical auth + user management service)
+  user-service:
     build:
-      context: ./services/auth-service
+      context: ./services/user-service
       dockerfile: Dockerfile
     ports:
-      - "3001:3001"
+      - "3005:3005"
     environment:
       - NODE_ENV=development
-      - PORT=3001
-      - MONGODB_URI=mongodb://mongodb:27017/auth
+      - PORT=3005
+      - MONGODB_URI=mongodb://mongodb:27017/user-service
       - JWT_SECRET=${JWT_SECRET}
-      - JWT_EXPIRES_IN=24h
+      - JWT_EXPIRES_IN=90d
+      - FRONTEND_URL=http://localhost:3001
+      - ADMIN_PROMOTE_KEY=${ADMIN_PROMOTE_KEY:-dev-promote}
       - SMTP_HOST=${SMTP_HOST}
       - SMTP_PORT=${SMTP_PORT}
       - SMTP_USER=${SMTP_USER}
@@ -61,11 +63,12 @@ services:
       context: ./services/template-service
       dockerfile: Dockerfile
     ports:
-      - "3003:3003"
+      - "3006:3006"
     environment:
       - NODE_ENV=development
-      - PORT=3003
-      - MONGODB_URI=mongodb://mongodb:27017/faithtech
+      - PORT=3006
+      - MONGODB_URI=mongodb://mongodb:27017/template
+      - JWT_SECRET=${JWT_SECRET}
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
@@ -76,22 +79,22 @@ services:
       - mongodb
       - redis
 
-  # Frontend Client
+  # Frontend Client (Vite dev server)
   client:
     build:
       context: ./client
       dockerfile: Dockerfile
     ports:
-      - "80:80"
+      - "3001:3001"
     environment:
       - NODE_ENV=development
-      - REACT_APP_API_URL=http://localhost:3000/api
+      - VITE_API_URL=http://localhost:3000/api
     depends_on:
       - api-gateway
 
   # MongoDB
   mongodb:
-    image: mongo:5.0
+    image: mongo:6.0
     ports:
       - "27017:27017"
     volumes:
@@ -105,13 +108,11 @@ services:
     volumes:
       - redis_data:/data
     command: redis-server --appendonly yes
-    networks:
-      - app-network
 
 volumes:
   mongodb_data:
   redis_data:
 
 networks:
-  app-network:
+  default:
     driver: bridge
